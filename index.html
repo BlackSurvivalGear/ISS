@@ -121,6 +121,18 @@
         <div class="form-navigation"><button class="secondary" type="button" id="backToTeam">Back</button><button class="primary" type="submit">Continue to Review</button></div>
         <button class="skip-step" type="button" id="skipOperations">Use defaults and continue</button>
       </form>
+      <section class="onboarding-step review-step" id="reviewStep" data-step="7" hidden>
+        <div class="step-heading"><p class="eyebrow">REVIEW & LAUNCH</p><h3>Your ISS workspace is ready to review</h3><p>Check the setup summary before opening your company dashboard.</p></div>
+        <div class="review-summary">
+          <article><span>Company</span><strong id="reviewCompany">—</strong><small id="reviewCreator">Account creator</small></article>
+          <article><span>Workspace</span><strong id="reviewWorkspace">—</strong><small>Secure company address</small></article>
+          <article><span>First Site</span><strong id="reviewSite">Not configured</strong><small id="reviewClient">Can be added later</small></article>
+          <article><span>Team</span><strong id="reviewTeam">0 invitations</strong><small>Role-based access</small></article>
+        </div>
+        <div class="launch-checklist"><strong>Initial setup</strong><span class="done">Account details</span><span class="done">Company profile</span><span class="done">Workspace address</span><span id="checkSite">First site</span><span id="checkTeam">Team invitations</span><span class="done">Operations defaults</span></div>
+        <div class="launch-note"><strong>What happens next?</strong><span>Launching opens the company dashboard. You can then complete site procedures, create shifts, configure patrol checkpoints and invite additional staff.</span></div>
+        <div class="form-navigation"><button class="secondary" type="button" id="backToOperations">Back</button><button class="primary launch-button" type="button" id="launchWorkspace">Launch Company Dashboard</button></div>
+      </section>
       <p class="coming" id="onboardingMessage">Step 1 of 7 · Account</p>
     </div>
   </div>
