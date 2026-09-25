@@ -93,6 +93,18 @@
         <div class="form-navigation"><button class="secondary" type="button" id="backToWorkspace">Back</button><button class="primary" type="submit">Continue to Team</button></div>
         <button class="skip-step" type="button" id="skipSite">Skip for now</button>
       </form>
+      <form class="account-form onboarding-step" id="teamForm" data-step="5" hidden>
+        <div class="step-heading"><p class="eyebrow">TEAM</p><h3>Invite your security team</h3><p>Add team members by role. Invitations will be scoped to this company and, where appropriate, the selected site.</p></div>
+        <div class="invite-builder">
+          <label>Work email<input type="email" id="inviteEmail" placeholder="officer@company.com"></label>
+          <div class="field-row"><label>Role<select id="inviteRole"><option>Operations Manager</option><option>Controller</option><option>Supervisor</option><option>Team Leader</option><option selected>Officer</option></select></label><label>Site assignment<select id="inviteSite"><option>First site</option><option>Company-wide</option></select></label></div>
+          <button class="secondary add-invite" type="button" id="addInvite">Add invitation</button>
+        </div>
+        <div class="invite-list" id="inviteList"><p class="empty-invites">No team invitations added yet.</p></div>
+        <div class="role-guide"><strong>Role access</strong><span><b>Operations Manager</b> · company operations</span><span><b>Controller</b> · control room and live operations</span><span><b>Supervisor</b> · site/shift oversight</span><span><b>Team Leader</b> · team and shift leadership</span><span><b>Officer</b> · assigned operational duties</span></div>
+        <div class="form-navigation"><button class="secondary" type="button" id="backToSite">Back</button><button class="primary" type="submit">Continue to Operations Setup</button></div>
+        <button class="skip-step" type="button" id="skipTeam">Skip for now</button>
+      </form>
       <p class="coming" id="onboardingMessage">Step 1 of 7 · Account</p>
     </div>
   </div>
