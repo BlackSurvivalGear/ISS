@@ -41,7 +41,7 @@ export async function getDashboardData(uid){
   ]);
   if(!companySnap.exists()) return null;
   const company=companySnap.data();
-  return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount:sitesSnap.size,teamCount:invitesSnap.size};
+  const user=userSnap.data();\n  return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount:sitesSnap.size,teamCount:invitesSnap.size,role:user.role||"Officer",siteId:user.siteId||"company-wide",siteName:user.siteName||"Company-wide"};
 }
 
 export async function listSites(companyId){
