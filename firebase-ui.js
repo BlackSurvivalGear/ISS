@@ -1,4 +1,4 @@
-import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData, listSites, saveSite } from "./backend.js";
+import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData, listSites, saveSite, listInvitations, saveInvitation, setInvitationStatus } from "./backend.js";
 
 const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
@@ -113,3 +113,21 @@ byId("addSite").addEventListener("click",()=>showSiteEditor(null));
 byId("closeSiteEditor").addEventListener("click",()=>siteEditor.hidden=true);
 byId("sitesList").addEventListener("click",async e=>{const button=e.target.closest(".edit-site");if(!button)return;const id=button.closest("[data-site-id]").dataset.siteId;const sites=await listSites(currentDashboard.companyId);showSiteEditor(sites.find(site=>site.id===id))});
 siteFormEditor.addEventListener("submit",async e=>{e.preventDefault();const status=byId("siteEditorMessage"),button=siteFormEditor.querySelector('button[type="submit"]');button.disabled=true;message(status,"Saving site…");try{const data=formData(siteFormEditor);await saveSite(currentDashboard.companyId,data);await refreshSites();siteEditor.hidden=true;message(status,"")}catch(error){console.error(error);message(status,"Could not save site.",true)}finally{button.disabled=false}});
+
+const teamView=byId("teamView"),teamEditor=byId("teamEditor"),teamEditorForm=byId("teamEditorForm");
+const renderTeam=invites=>{
+  byId("teamList").innerHTML=invites.length?invites.map(invite=>'<article class="site-card team-card" data-invite-id="'+escapeHtml(invite.id)+'"><div><span class="site-status">'+escapeHtml(invite.status||"pending")+'</span><h3>'+escapeHtml(invite.name||invite.email||"Team member")+'</h3><p>'+escapeHtml(invite.email||"")+'</p></div><div class="site-meta"><small>ROLE</small><strong>'+escapeHtml(invite.role||"Officer")+'</strong></div><div class="site-meta"><small>ACCESS</small><span>'+escapeHtml(invite.status==="active"?"Enabled":invite.status==="suspended"?"Suspended":"Invitation pending")+'</span></div><div class="team-actions"><button class="secondary edit-invite" type="button">Edit</button>'+(invite.status==="suspended"?'<button class="secondary team-status" data-status="active" type="button">Reactivate</button>':'<button class="secondary team-status" data-status="suspended" type="button">Suspend</button>')+'</div></article>').join(""):'<div class="empty-sites">No team invitations configured.</div>';
+};
+const refreshTeam=async()=>{
+  if(!currentDashboard)return;
+  const invites=await listInvitations(currentDashboard.companyId);renderTeam(invites);byId("dashboardTeam").textContent=String(invites.length);return invites;
+};
+const openTeamView=async()=>{byId("companyDashboard").hidden=true;sitesView.hidden=true;teamView.hidden=false;window.scrollTo({top:0});await refreshTeam()};
+byId("openTeam").addEventListener("click",openTeamView);
+byId("openTeam").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")openTeamView()});
+byId("backTeamDashboard").addEventListener("click",()=>{teamView.hidden=true;byId("companyDashboard").hidden=false;window.scrollTo({top:0})});
+const showTeamEditor=invite=>{teamEditorForm.reset();teamEditorForm.elements.id.value=invite?.id||"";teamEditorForm.elements.name.value=invite?.name||"";teamEditorForm.elements.email.value=invite?.email||"";teamEditorForm.elements.role.value=invite?.role||"Officer";teamEditorForm.elements.status.value=invite?.status||"pending";byId("teamEditorTitle").textContent=invite?"Edit Team Access":"Invite Team Member";teamEditor.hidden=false};
+byId("addTeamInvite").addEventListener("click",()=>showTeamEditor(null));
+byId("closeTeamEditor").addEventListener("click",()=>teamEditor.hidden=true);
+byId("teamList").addEventListener("click",async e=>{const card=e.target.closest("[data-invite-id]");if(!card)return;const id=card.dataset.inviteId;if(e.target.closest(".edit-invite")){const invites=await listInvitations(currentDashboard.companyId);showTeamEditor(invites.find(item=>item.id===id));return}const statusButton=e.target.closest(".team-status");if(statusButton){await setInvitationStatus(currentDashboard.companyId,id,statusButton.dataset.status);await refreshTeam()}});
+teamEditorForm.addEventListener("submit",async e=>{e.preventDefault();const status=byId("teamEditorMessage"),button=teamEditorForm.querySelector('button[type="submit"]');button.disabled=true;message(status,"Saving invitation…");try{await saveInvitation(currentDashboard.companyId,formData(teamEditorForm));await refreshTeam();teamEditor.hidden=true;message(status,"")}catch(error){console.error(error);message(status,"Could not save invitation.",true)}finally{button.disabled=false}});

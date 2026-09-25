@@ -1,7 +1,7 @@
 // ISS backend foundation: Firebase Authentication + Firestore tenant persistence.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
 const app=initializeApp(firebaseConfig);
@@ -52,6 +52,19 @@ export async function saveSite(companyId,site){
   const payload={name:site.name,clientName:site.clientName||"",address:site.address||"",timezone:site.timezone||"Europe/London",contact:site.contact||"",status:site.status||"setup",updatedAt:serverTimestamp()};
   if(site.id){await setDoc(doc(db,"companies",companyId,"sites",site.id),payload,{merge:true});return site.id}
   const ref=await addDoc(collection(db,"companies",companyId,"sites"),{...payload,createdAt:serverTimestamp()});return ref.id;
+}
+
+export async function listInvitations(companyId){
+  const snap=await getDocs(collection(db,"companies",companyId,"invitations"));
+  return snap.docs.map(item=>({id:item.id,...item.data()}));
+}
+export async function saveInvitation(companyId,invite){
+  const payload={name:invite.name||"",email:String(invite.email||"").trim().toLowerCase(),role:invite.role||"Officer",status:invite.status||"pending",updatedAt:serverTimestamp()};
+  if(invite.id){await setDoc(doc(db,"companies",companyId,"invitations",invite.id),payload,{merge:true});return invite.id}
+  const ref=await addDoc(collection(db,"companies",companyId,"invitations"),{...payload,createdAt:serverTimestamp()});return ref.id;
+}
+export async function setInvitationStatus(companyId,id,status){
+  await updateDoc(doc(db,"companies",companyId,"invitations",id),{status,updatedAt:serverTimestamp()});
 }
 
 export const signIn=(email,password)=>signInWithEmailAndPassword(auth,email,password);
