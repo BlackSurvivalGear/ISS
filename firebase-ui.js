@@ -4,6 +4,16 @@ const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
 
+const openCompanyDashboard=({companyName="Company Dashboard",workspaceSlug="",siteCount=1,teamCount=0}={})=>{
+  byId("publicHome").hidden=true;
+  byId("companyDashboard").hidden=false;
+  byId("dashboardCompanyName").textContent=companyName||"Company Dashboard";
+  byId("dashboardWorkspace").textContent=workspaceSlug||"—";
+  byId("dashboardSites").textContent=String(siteCount);
+  byId("dashboardTeam").textContent=String(teamCount);
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
 const launch=byId("launchWorkspace");
 launch.addEventListener("click",async event=>{
   event.stopImmediatePropagation();
@@ -26,7 +36,7 @@ launch.addEventListener("click",async event=>{
     localStorage.setItem("iss-company-id",result.companyId);
     localStorage.setItem("iss-workspace-slug",result.workspaceSlug);
     byId("onboarding").hidden=true;
-    byId("operations").scrollIntoView({behavior:"smooth",block:"start"});
+    openCompanyDashboard({companyName:company.companyName,workspaceSlug:result.workspaceSlug,siteCount:site.siteName?1:0,teamCount:(window.ISSInvites||[]).length});
   }catch(error){
     console.error(error);
     message(status,error?.message||"Could not create the company workspace.",true);
@@ -44,7 +54,7 @@ signinForm.addEventListener("submit",async event=>{
   try{
     await signIn(data.email,data.password);
     byId("signin").hidden=true;
-    byId("operations").scrollIntoView({behavior:"smooth",block:"start"});
+    openCompanyDashboard({workspaceSlug:localStorage.getItem("iss-workspace-slug")||""});
     message(status,"Signed in.");
   }catch(error){
     console.error(error);
