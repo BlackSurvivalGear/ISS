@@ -75,6 +75,14 @@
         <div class="logo-preview" id="logoPreview" hidden><img alt="Company logo preview" id="logoPreviewImage"><span>Logo preview</span></div>
         <div class="form-navigation"><button class="secondary" type="button" id="backToAccount">Back</button><button class="primary" type="submit">Continue to Workspace</button></div>
       </form>
+      <form class="account-form onboarding-step" id="workspaceForm" data-step="3" hidden>
+        <div class="step-heading"><p class="eyebrow">WORKSPACE</p><h3>Create your company workspace</h3><p>This becomes the secure address your team will use to access ISS.</p></div>
+        <label>Workspace name<input name="workspaceName" id="workspaceName" required placeholder="Alpha Security"></label>
+        <label>Workspace address<div class="workspace-address"><input name="workspaceSlug" id="workspaceSlug" required pattern="[a-z0-9-]+" placeholder="alpha-security" aria-describedby="slugHelp"><span>.ISS-DOMAIN</span></div><small id="slugHelp" class="field-help">Lowercase letters, numbers and hyphens only. You can edit this before launch.</small></label>
+        <div class="slug-status" id="slugStatus"><i></i><span>Enter a workspace name to generate an address.</span></div>
+        <div class="workspace-preview"><span>YOUR TEAM WILL SIGN IN AT</span><strong id="workspacePreview">your-company.ISS-DOMAIN</strong></div>
+        <div class="form-navigation"><button class="secondary" type="button" id="backToCompany">Back</button><button class="primary" type="submit">Continue to First Site</button></div>
+      </form>
       <p class="coming" id="onboardingMessage">Step 1 of 7 · Account</p>
     </div>
   </div>
