@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050b16">
+  <title>ISS | Security Operations</title>
+  <link rel="icon" type="image/png" href="favi%20(1).png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <img src="favi%20(1).png" alt="" class="brand-mark">
+    <div class="brand-copy"><strong>ISS</strong><span>ImoTech Security Solutions</span></div>
+    <button class="menu" aria-label="Open menu">☰</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <img src="ISS.png" alt="ImoTech Security Solutions" class="hero-logo">
+      <p class="eyebrow">SECURITY OPERATIONS</p>
+      <h1>Every site. Every shift.<br><span>Accounted for.</span></h1>
+      <p class="intro">One operational platform for officers, patrols, incidents, site procedures and client reporting.</p>
+      <div class="actions">
+        <button class="primary" data-action="signin">Security Sign-In</button>
+        <button class="secondary" data-action="overview">View Operations</button>
+      </div>
+    </section>
+
+    <section class="status-panel" id="operations">
+      <div class="section-heading"><div><p class="eyebrow">LIVE CONTROL</p><h2>Operations overview</h2></div><span class="live"><i></i> SYSTEM READY</span></div>
+      <div class="stats">
+        <article><span>Active Sites</span><strong>—</strong><small>Awaiting setup</small></article>
+        <article><span>Officers On Duty</span><strong>—</strong><small>No active shift</small></article>
+        <article><span>Patrols</span><strong>—</strong><small>No patrol data</small></article>
+        <article><span>Incidents Today</span><strong>0</strong><small>Nothing reported</small></article>
+      </div>
+    </section>
+
+    <section class="modules">
+      <p class="eyebrow">CORE OPERATIONS</p>
+      <h2>Built for the security shift</h2>
+      <div class="module-grid">
+        <article><b>01</b><h3>Shift Control</h3><p>Start and end duty, site assignment and handover accountability.</p></article>
+        <article><b>02</b><h3>Patrols</h3><p>Checkpoint verification and patrol completion records.</p></article>
+        <article><b>03</b><h3>Incident Reports</h3><p>Fast structured reporting with evidence and timestamps.</p></article>
+        <article><b>04</b><h3>Site Procedures</h3><p>Digital opening, closing and operational checklists.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="signin" hidden>
+    <div class="modal-card">
+      <button class="close" aria-label="Close">×</button>
+      <img src="favi%20(1).png" alt="ISS" class="modal-logo">
+      <p class="eyebrow">SECURITY SIGN-IN</p>
+      <h2>Select your role</h2>
+      <div class="roles">
+        <button>Officer</button><button>Team Leader</button><button>Supervisor</button><button>Controller</button><button>Manager</button>
+      </div>
+      <p class="coming">Authentication will be connected in the next build stage.</p>
+    </div>
+  </div>
+
+  <footer>© 2026 ImoTech Security Solutions <span>Secure Today. Protect Tomorrow.</span></footer>
+  <script src="app.js"></script>
+</body>
+</html>
