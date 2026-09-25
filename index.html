@@ -59,12 +59,22 @@
       </div>
     </section>
     <section class="modules"><p class="eyebrow">OPERATIONS</p><h2>Company control centre</h2><div class="module-grid">
-      <article><b>01</b><h3>Sites</h3><p>Manage security locations and site requirements.</p></article>
+      <article class="module-action" id="openSites" tabindex="0"><b>01</b><h3>Sites</h3><p>Manage security locations and site requirements.</p></article>
       <article><b>02</b><h3>Team</h3><p>Manage officers, supervisors and company access.</p></article>
       <article><b>03</b><h3>Shifts & Patrols</h3><p>Configure duty periods, patrols and checkpoints.</p></article>
       <article><b>04</b><h3>Reports</h3><p>Incidents, occurrence book and client evidence.</p></article>
     </div></section>
   </main>
+
+  <main id="sitesView" hidden>
+    <section class="status-panel sites-page">
+      <div class="section-heading"><div><p class="eyebrow">SITE MANAGEMENT</p><h2>Security Sites</h2></div><div class="actions"><button class="secondary" id="backDashboard" type="button">Back to Dashboard</button><button class="primary" id="addSite" type="button">Add Site</button></div></div>
+      <p class="intro sites-intro">Manage client locations, operational status and site contact details.</p>
+      <div id="sitesList" class="sites-list"></div>
+    </section>
+  </main>
+
+  <div class="modal" id="siteEditor" hidden><div class="modal-card onboarding-card"><button class="close" id="closeSiteEditor" aria-label="Close">×</button><p class="eyebrow">SITE DETAILS</p><h2 id="siteEditorTitle">Add Site</h2><form class="account-form" id="siteEditorForm"><input type="hidden" name="id"><label>Site name<input name="name" required></label><label>Client / organisation<input name="clientName" required></label><label>Site address<textarea name="address" rows="3" required></textarea></label><div class="field-row"><label>Timezone<select name="timezone"><option value="Europe/London">United Kingdom · Europe/London</option><option value="Africa/Lagos">Nigeria · Africa/Lagos</option><option value="Africa/Accra">Ghana · Africa/Accra</option><option value="Africa/Johannesburg">South Africa · Africa/Johannesburg</option><option value="Africa/Nairobi">Kenya · Africa/Nairobi</option></select></label><label>Site contact<input name="contact"></label></div><label>Status<select name="status"><option value="setup">Setup</option><option value="active">Active</option><option value="suspended">Suspended</option></select></label><button class="primary form-submit" type="submit">Save Site</button><p class="coming" id="siteEditorMessage"></p></form></div></div>
 
   <div class="modal" id="onboarding" hidden>
     <div class="modal-card onboarding-card">
