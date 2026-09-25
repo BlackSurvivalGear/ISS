@@ -4,14 +4,6 @@ service cloud.firestore {
     function signedIn(){ return request.auth != null; }
     function userDoc(){ return get(/databases/$(database)/documents/users/$(request.auth.uid)); }
     function companyMember(companyId){ return signedIn() && userDoc().data.companyId == companyId && userDoc().data.status == "active"; }
-    function role(){ return signedIn() ? userDoc().data.role : ""; }
-    function owner(companyId){ return signedIn() && request.auth.uid == companyId && companyMember(companyId) && role() == "Company Owner"; }
-    function manager(companyId){ return companyMember(companyId) && role() in ["Company Owner","Operations Manager"]; }
-    function operations(companyId){ return companyMember(companyId) && role() in ["Company Owner","Operations Manager","Controller","Supervisor","Team Leader","Officer"]; }
-    function siteAccess(companyId, siteId){
-      return companyMember(companyId)
-        && (userDoc().data.siteId == null || userDoc().data.siteId == "company-wide" || userDoc().data.siteId == siteId);
-    }
     function invite(companyId, invitationId){ return get(/databases/$(database)/documents/companies/$(companyId)/invitations/$(invitationId)); }
     function validInvitation(companyId){
       return signedIn()
@@ -20,62 +12,38 @@ service cloud.firestore {
         && invite(companyId, request.resource.data.invitationId).data.email == request.auth.token.email
         && invite(companyId, request.resource.data.invitationId).data.status == "pending";
     }
-    function membershipUnchanged(){
+    function protectedMembershipUnchanged(){
       return request.resource.data.companyId == resource.data.companyId
         && request.resource.data.role == resource.data.role
         && request.resource.data.status == resource.data.status
         && request.resource.data.siteId == resource.data.siteId
         && request.resource.data.invitationId == resource.data.invitationId;
     }
-
     match /workspaceSlugs/{slug} {
       allow read: if true;
       allow create: if signedIn() && request.resource.data.companyId == request.auth.uid;
       allow update, delete: if false;
     }
-
     match /users/{uid} {
-      allow create: if signedIn() && request.auth.uid == uid
-        && (request.resource.data.companyId == uid || validInvitation(request.resource.data.companyId));
-      allow read: if signedIn() && (request.auth.uid == uid || manager(resource.data.companyId));
-      allow update: if signedIn() && request.auth.uid == uid && membershipUnchanged();
+      allow create: if signedIn() && request.auth.uid == uid && (request.resource.data.companyId == uid || validInvitation(request.resource.data.companyId));
+      allow read: if signedIn() && (request.auth.uid == uid || companyMember(resource.data.companyId));
+      allow update: if signedIn() && request.auth.uid == uid && protectedMembershipUnchanged();
       allow delete: if false;
     }
-
     match /companies/{companyId} {
       allow create: if signedIn() && request.auth.uid == companyId && request.resource.data.ownerUid == request.auth.uid;
-      allow read: if companyMember(companyId);
-      allow update: if manager(companyId) && request.resource.data.ownerUid == resource.data.ownerUid;
-      allow delete: if owner(companyId) && request.auth.uid == resource.data.ownerUid;
-
-      match /sites/{siteId} {
-        allow read: if companyMember(companyId) && (manager(companyId) || siteAccess(companyId, siteId));
-        allow create, update: if manager(companyId);
-        allow delete: if owner(companyId);
-      }
-
+      allow read, update: if companyMember(companyId);
+      allow delete: if signedIn() && request.auth.uid == resource.data.ownerUid;
       match /invitations/{invitationId} {
-        allow read: if manager(companyId)
-          || (signedIn() && resource.data.email == request.auth.token.email);
-        allow create: if manager(companyId);
-        allow update: if manager(companyId)
-          || (signedIn()
-            && resource.data.email == request.auth.token.email
-            && resource.data.status == "pending"
-            && request.resource.data.status == "active"
-            && request.resource.data.acceptedUid == request.auth.uid
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status","acceptedUid","acceptedAt","updatedAt"]));
-        allow delete: if owner(companyId);
+        allow read: if companyMember(companyId) || (signedIn() && resource.data.email == request.auth.token.email);
+        allow create: if signedIn() && request.auth.uid == companyId;
+        allow update: if companyMember(companyId) || (signedIn() && resource.data.email == request.auth.token.email && resource.data.status == "pending" && request.resource.data.status == "active" && request.resource.data.acceptedUid == request.auth.uid);
+        allow delete: if companyMember(companyId);
       }
-
-      match /settings/{settingId} {
-        allow read: if operations(companyId);
-        allow create, update: if manager(companyId);
-        allow delete: if owner(companyId);
-      }
-
       match /{document=**} {
-        allow read, write: if false;
+        allow read: if companyMember(companyId);
+        allow create: if signedIn() && request.auth.uid == companyId;
+        allow update, delete: if companyMember(companyId);
       }
     }
   }
