@@ -1,4 +1,4 @@
-import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData } from "./backend.js";
+import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData, listSites, saveSite } from "./backend.js";
 
 const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
@@ -27,6 +27,7 @@ const loadDashboard=async user=>{
   localStorage.setItem("iss-company-id",data.companyId);
   localStorage.setItem("iss-workspace-slug",data.workspaceSlug);
   openCompanyDashboard(data);
+  currentDashboard=data;
   return data;
 };
 
@@ -90,3 +91,25 @@ observeAuth(async user=>{
   if(!user){openPublicHome();return}
   try{await loadDashboard(user)}catch(error){console.error("Could not restore company workspace.",error)}
 });
+
+let currentDashboard=null;
+const sitesView=byId("sitesView"),siteEditor=byId("siteEditor"),siteFormEditor=byId("siteEditorForm");
+const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+const renderSites=sites=>{
+  byId("sitesList").innerHTML=sites.length?sites.map(site=>'<article class="site-card" data-site-id="'+escapeHtml(site.id)+'"><div><span class="site-status">'+escapeHtml(site.status||"setup")+'</span><h3>'+escapeHtml(site.name||"Unnamed site")+'</h3><p>'+escapeHtml(site.clientName||"No client")+'</p></div><div class="site-meta"><small>ADDRESS</small><span>'+escapeHtml(site.address||"Not set")+'</span></div><div class="site-meta"><small>CONTACT</small><span>'+escapeHtml(site.contact||"Not set")+'</span><small>'+escapeHtml(site.timezone||"")+'</small></div><button class="secondary edit-site" type="button">Edit</button></article>').join(""):'<div class="empty-sites">No sites configured. Add your first security site.</div>';
+};
+const refreshSites=async()=>{
+  if(!currentDashboard)return;
+  const sites=await listSites(currentDashboard.companyId);
+  renderSites(sites);byId("dashboardSites").textContent=String(sites.length);
+  return sites;
+};
+const openSitesView=async()=>{byId("companyDashboard").hidden=true;sitesView.hidden=false;window.scrollTo({top:0});await refreshSites()};
+byId("openSites").addEventListener("click",openSitesView);
+byId("openSites").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")openSitesView()});
+byId("backDashboard").addEventListener("click",()=>{sitesView.hidden=true;byId("companyDashboard").hidden=false;window.scrollTo({top:0})});
+const showSiteEditor=site=>{siteFormEditor.reset();siteFormEditor.elements.id.value=site?.id||"";siteFormEditor.elements.name.value=site?.name||"";siteFormEditor.elements.clientName.value=site?.clientName||"";siteFormEditor.elements.address.value=site?.address||"";siteFormEditor.elements.timezone.value=site?.timezone||"Europe/London";siteFormEditor.elements.contact.value=site?.contact||"";siteFormEditor.elements.status.value=site?.status||"setup";byId("siteEditorTitle").textContent=site?"Edit Site":"Add Site";siteEditor.hidden=false};
+byId("addSite").addEventListener("click",()=>showSiteEditor(null));
+byId("closeSiteEditor").addEventListener("click",()=>siteEditor.hidden=true);
+byId("sitesList").addEventListener("click",async e=>{const button=e.target.closest(".edit-site");if(!button)return;const id=button.closest("[data-site-id]").dataset.siteId;const sites=await listSites(currentDashboard.companyId);showSiteEditor(sites.find(site=>site.id===id))});
+siteFormEditor.addEventListener("submit",async e=>{e.preventDefault();const status=byId("siteEditorMessage"),button=siteFormEditor.querySelector('button[type="submit"]');button.disabled=true;message(status,"Saving site…");try{const data=formData(siteFormEditor);await saveSite(currentDashboard.companyId,data);await refreshSites();siteEditor.hidden=true;message(status,"")}catch(error){console.error(error);message(status,"Could not save site.",true)}finally{button.disabled=false}});
