@@ -3,14 +3,22 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn(){ return request.auth != null; }
     function userDoc(){ return get(/databases/$(database)/documents/users/$(request.auth.uid)); }
-    function companyMember(companyId){ return signedIn() && userDoc().data.companyId == companyId; }
+    function companyMember(companyId){ return signedIn() && userDoc().data.companyId == companyId && userDoc().data.status == "active"; }
+    function invite(companyId, invitationId){ return get(/databases/$(database)/documents/companies/$(companyId)/invitations/$(invitationId)); }
+    function validInvitation(companyId){
+      return signedIn()
+        && request.resource.data.companyId == companyId
+        && request.resource.data.invitationId is string
+        && invite(companyId, request.resource.data.invitationId).data.email == request.auth.token.email
+        && invite(companyId, request.resource.data.invitationId).data.status == "pending";
+    }
     match /workspaceSlugs/{slug} {
       allow read: if true;
       allow create: if signedIn() && request.resource.data.companyId == request.auth.uid;
       allow update, delete: if false;
     }
     match /users/{uid} {
-      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.companyId == uid;
+      allow create: if signedIn() && request.auth.uid == uid && (request.resource.data.companyId == uid || validInvitation(request.resource.data.companyId));
       allow read: if signedIn() && (request.auth.uid == uid || companyMember(resource.data.companyId));
       allow update: if signedIn() && request.auth.uid == uid;
       allow delete: if false;
@@ -19,6 +27,12 @@ service cloud.firestore {
       allow create: if signedIn() && request.auth.uid == companyId && request.resource.data.ownerUid == request.auth.uid;
       allow read, update: if companyMember(companyId);
       allow delete: if signedIn() && request.auth.uid == resource.data.ownerUid;
+      match /invitations/{invitationId} {
+        allow read: if companyMember(companyId) || (signedIn() && resource.data.email == request.auth.token.email);
+        allow create: if signedIn() && request.auth.uid == companyId;
+        allow update: if companyMember(companyId) || (signedIn() && resource.data.email == request.auth.token.email && resource.data.status == "pending" && request.resource.data.status == "active" && request.resource.data.acceptedUid == request.auth.uid);
+        allow delete: if companyMember(companyId);
+      }
       match /{document=**} {
         allow read: if companyMember(companyId);
         allow create: if signedIn() && request.auth.uid == companyId;
