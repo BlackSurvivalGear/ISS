@@ -22,8 +22,8 @@
       <h1>Every site. Every shift.<br><span>Accounted for.</span></h1>
       <p class="intro">One operational platform for officers, patrols, incidents, site procedures and client reporting.</p>
       <div class="actions">
-        <button class="primary" data-action="signin">Security Sign-In</button>
-        <button class="secondary" data-action="overview">View Operations</button>
+        <button class="primary" data-action="create-company">Create Company Account</button>
+        <button class="secondary" data-action="signin">Sign In</button>
       </div>
     </section>
 
@@ -49,16 +49,32 @@
     </section>
   </main>
 
+  <div class="modal" id="onboarding" hidden>
+    <div class="modal-card onboarding-card">
+      <button class="close onboarding-close" aria-label="Close">×</button>
+      <img src="favi%20(1).png" alt="ISS" class="modal-logo">
+      <p class="eyebrow">CREATE COMPANY ACCOUNT</p>
+      <h2>Set up your ISS workspace</h2>
+      <p class="form-intro">Create the account that will manage your security company platform.</p>
+      <form class="account-form" id="accountForm">
+        <div class="field-row"><label>First name<input name="firstName" autocomplete="given-name" required></label><label>Last name<input name="lastName" autocomplete="family-name" required></label></div>
+        <label>Work email<input type="email" name="email" autocomplete="email" required></label>
+        <div class="field-row"><label>Password<input type="password" name="password" autocomplete="new-password" minlength="8" required></label><label>Confirm password<input type="password" name="confirmPassword" autocomplete="new-password" minlength="8" required></label></div>
+        <fieldset><legend>Your role</legend><div class="role-choice"><label><input type="radio" name="creatorRole" value="company_owner" checked><span><strong>Company Owner</strong><small>I own or direct the security company.</small></span></label><label><input type="radio" name="creatorRole" value="operations_manager"><span><strong>Operations Manager</strong><small>I am authorised to set up the company platform.</small></span></label></div></fieldset>
+        <label class="terms"><input type="checkbox" name="terms" required><span>I agree to the ISS terms and privacy requirements.</span></label>
+        <button class="primary form-submit" type="submit">Continue to Company Details</button>
+      </form>
+      <p class="coming" id="onboardingMessage">Step 1 of 7 · Account</p>
+    </div>
+  </div>
+
   <div class="modal" id="signin" hidden>
     <div class="modal-card">
       <button class="close" aria-label="Close">×</button>
       <img src="favi%20(1).png" alt="ISS" class="modal-logo">
       <p class="eyebrow">SECURITY SIGN-IN</p>
-      <h2>Select your role</h2>
-      <div class="roles">
-        <button>Officer</button><button>Team Leader</button><button>Supervisor</button><button>Controller</button><button>Manager</button>
-      </div>
-      <p class="coming">Authentication will be connected in the next build stage.</p>
+      <h2>Sign in to your company</h2>
+      <p class="form-intro">Existing owners, managers and invited staff will sign in here when authentication is connected.</p><p class="coming">Company authentication will be connected in a later stage.</p>
     </div>
   </div>
 
