@@ -105,6 +105,22 @@
         <div class="form-navigation"><button class="secondary" type="button" id="backToSite">Back</button><button class="primary" type="submit">Continue to Operations Setup</button></div>
         <button class="skip-step" type="button" id="skipTeam">Skip for now</button>
       </form>
+      <form class="account-form onboarding-step" id="operationsForm" data-step="6" hidden>
+        <div class="step-heading"><p class="eyebrow">OPERATIONS SETUP</p><h3>Set the operational basics</h3><p>Configure the minimum controls needed to start running your first security site.</p></div>
+        <div class="ops-grid">
+          <label>Shift pattern<select name="shiftPattern"><option>Day / Night shifts</option><option>Single daily shift</option><option>24-hour rotating cover</option><option>Custom / configure later</option></select></label>
+          <label>First shift starts<input type="time" name="firstShiftStart" value="06:00"></label>
+        </div>
+        <div class="setup-options">
+          <label><input type="checkbox" name="patrols" checked><span><strong>Patrols required</strong><small>Enable patrol records and checkpoint verification for the site.</small></span></label>
+          <label><input type="checkbox" name="openingProcedure" checked><span><strong>Opening procedure</strong><small>Create a required opening checklist for the site.</small></span></label>
+          <label><input type="checkbox" name="closingProcedure" checked><span><strong>Closing procedure</strong><small>Create a required closing checklist for the site.</small></span></label>
+          <label><input type="checkbox" name="emergencyInstructions" checked><span><strong>Emergency & site instructions</strong><small>Prepare site-specific emergency and operational instructions.</small></span></label>
+        </div>
+        <div class="setup-note"><strong>Start simple</strong><span>Detailed patrol routes, checklist steps and shift schedules can be completed from the company dashboard after launch.</span></div>
+        <div class="form-navigation"><button class="secondary" type="button" id="backToTeam">Back</button><button class="primary" type="submit">Continue to Review</button></div>
+        <button class="skip-step" type="button" id="skipOperations">Use defaults and continue</button>
+      </form>
       <p class="coming" id="onboardingMessage">Step 1 of 7 · Account</p>
     </div>
   </div>
