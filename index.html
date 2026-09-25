@@ -78,10 +78,20 @@
       <form class="account-form onboarding-step" id="workspaceForm" data-step="3" hidden>
         <div class="step-heading"><p class="eyebrow">WORKSPACE</p><h3>Create your company workspace</h3><p>This becomes the secure address your team will use to access ISS.</p></div>
         <label>Workspace name<input name="workspaceName" id="workspaceName" required placeholder="Alpha Security"></label>
-        <label>Workspace address<div class="workspace-address"><input name="workspaceSlug" id="workspaceSlug" required pattern="[a-z0-9-]+" placeholder="alpha-security" aria-describedby="slugHelp"><span>.ISS-DOMAIN</span></div><small id="slugHelp" class="field-help">Lowercase letters, numbers and hyphens only. You can edit this before launch.</small></label>
+        <label>Workspace address<div class="workspace-address"><input name="workspaceSlug" id="workspaceSlug" required pattern="[a-z0-9-]+" placeholder="alpha-security" aria-describedby="slugHelp"><span>.imotech.solutions</span></div><small id="slugHelp" class="field-help">Lowercase letters, numbers and hyphens only. You can edit this before launch.</small></label>
         <div class="slug-status" id="slugStatus"><i></i><span>Enter a workspace name to generate an address.</span></div>
-        <div class="workspace-preview"><span>YOUR TEAM WILL SIGN IN AT</span><strong id="workspacePreview">your-company.ISS-DOMAIN</strong></div>
+        <div class="workspace-preview"><span>YOUR TEAM WILL SIGN IN AT</span><strong id="workspacePreview">your-company.imotech.solutions</strong></div>
         <div class="form-navigation"><button class="secondary" type="button" id="backToCompany">Back</button><button class="primary" type="submit">Continue to First Site</button></div>
+      </form>
+      <form class="account-form onboarding-step" id="siteForm" data-step="4" hidden>
+        <div class="step-heading"><p class="eyebrow">FIRST SITE</p><h3>Add your first security site</h3><p>Create the first operational location your company will manage in ISS.</p></div>
+        <label>Site name<input name="siteName" required placeholder="Head Office Security"></label>
+        <label>Client / organisation<input name="clientName" required placeholder="Client name"></label>
+        <label>Site address<textarea name="siteAddress" rows="3" required placeholder="Full site address"></textarea></label>
+        <div class="field-row"><label>Timezone<select name="timezone" required><option value="Europe/London">United Kingdom · Europe/London</option><option value="Africa/Lagos">Nigeria · Africa/Lagos</option><option value="Africa/Accra">Ghana · Africa/Accra</option><option value="Africa/Johannesburg">South Africa · Africa/Johannesburg</option><option value="Africa/Nairobi">Kenya · Africa/Nairobi</option></select></label><label>Site contact <span class="optional">Optional</span><input name="siteContact" placeholder="Name or phone"></label></div>
+        <div class="site-note"><strong>Initial status: Setup</strong><span>The site stays in setup until its team and operating requirements are configured.</span></div>
+        <div class="form-navigation"><button class="secondary" type="button" id="backToWorkspace">Back</button><button class="primary" type="submit">Continue to Team</button></div>
+        <button class="skip-step" type="button" id="skipSite">Skip for now</button>
       </form>
       <p class="coming" id="onboardingMessage">Step 1 of 7 · Account</p>
     </div>
