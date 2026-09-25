@@ -56,13 +56,24 @@
       <p class="eyebrow">CREATE COMPANY ACCOUNT</p>
       <h2>Set up your ISS workspace</h2>
       <p class="form-intro">Create the account that will manage your security company platform.</p>
-      <form class="account-form" id="accountForm">
+      <form class="account-form onboarding-step active" id="accountForm" data-step="1">
         <div class="field-row"><label>First name<input name="firstName" autocomplete="given-name" required></label><label>Last name<input name="lastName" autocomplete="family-name" required></label></div>
         <label>Work email<input type="email" name="email" autocomplete="email" required></label>
         <div class="field-row"><label>Password<input type="password" name="password" autocomplete="new-password" minlength="8" required></label><label>Confirm password<input type="password" name="confirmPassword" autocomplete="new-password" minlength="8" required></label></div>
         <fieldset><legend>Your role</legend><div class="role-choice"><label><input type="radio" name="creatorRole" value="company_owner" checked><span><strong>Company Owner</strong><small>I own or direct the security company.</small></span></label><label><input type="radio" name="creatorRole" value="operations_manager"><span><strong>Operations Manager</strong><small>I am authorised to set up the company platform.</small></span></label></div></fieldset>
         <label class="terms"><input type="checkbox" name="terms" required><span>I agree to the ISS terms and privacy requirements.</span></label>
         <button class="primary form-submit" type="submit">Continue to Company Details</button>
+      </form>
+      <form class="account-form onboarding-step" id="companyForm" data-step="2" hidden>
+        <div class="step-heading"><p class="eyebrow">COMPANY DETAILS</p><h3>Tell us about your security company</h3><p>These details identify the organisation that owns this ISS workspace.</p></div>
+        <label>Legal / company name<input name="companyName" autocomplete="organization" required></label>
+        <label>Trading name <span class="optional">Optional</span><input name="tradingName"></label>
+        <div class="field-row"><label>Country<select name="country" required><option value="">Select country</option><option>United Kingdom</option><option>Nigeria</option><option>Ghana</option><option>South Africa</option><option>Kenya</option><option>Other</option></select></label><label>Company phone<input type="tel" name="companyPhone" autocomplete="tel" required></label></div>
+        <label>Company email<input type="email" name="companyEmail" autocomplete="email" required></label>
+        <div class="field-row"><label>Website <span class="optional">Optional</span><input type="url" name="website" placeholder="https://"></label><label>Registration number <span class="optional">Optional</span><input name="registrationNumber"></label></div>
+        <label>Company logo <span class="optional">Optional</span><input type="file" name="companyLogo" id="companyLogo" accept="image/png,image/jpeg,image/webp"></label>
+        <div class="logo-preview" id="logoPreview" hidden><img alt="Company logo preview" id="logoPreviewImage"><span>Logo preview</span></div>
+        <div class="form-navigation"><button class="secondary" type="button" id="backToAccount">Back</button><button class="primary" type="submit">Continue to Workspace</button></div>
       </form>
       <p class="coming" id="onboardingMessage">Step 1 of 7 · Account</p>
     </div>
