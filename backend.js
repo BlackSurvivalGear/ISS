@@ -59,7 +59,7 @@ export async function listInvitations(companyId){
   return snap.docs.map(item=>({id:item.id,...item.data()}));
 }
 export async function saveInvitation(companyId,invite){
-  const payload={name:invite.name||"",email:String(invite.email||"").trim().toLowerCase(),role:invite.role||"Officer",status:invite.status||"pending",updatedAt:serverTimestamp()};
+  const payload={name:invite.name||"",email:String(invite.email||"").trim().toLowerCase(),role:invite.role||"Officer",siteId:invite.siteId||"company-wide",siteName:invite.siteName||"Company-wide",status:invite.status||"pending",updatedAt:serverTimestamp()};
   if(invite.id){await setDoc(doc(db,"companies",companyId,"invitations",invite.id),payload,{merge:true});return invite.id}
   const ref=await addDoc(collection(db,"companies",companyId,"invitations"),{...payload,createdAt:serverTimestamp()});return ref.id;
 }
