@@ -4,13 +4,37 @@ const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
 
-const openCompanyDashboard=({companyName="Company Dashboard",workspaceSlug="",siteCount=0,teamCount=0}={})=>{
+const ROLE_ACCESS={
+  "Company Owner":{sites:true,team:true},
+  "company_owner":{sites:true,team:true},
+  "Operations Manager":{sites:true,team:true},
+  "operations_manager":{sites:true,team:true},
+  "Controller":{sites:true,team:false},
+  "Supervisor":{sites:true,team:false},
+  "Team Leader":{sites:true,team:false},
+  "Officer":{sites:true,team:false},
+  "Client":{sites:true,team:false}
+};
+const roleAccess=role=>ROLE_ACCESS[role]||{sites:false,team:false};
+const applyRoleAccess=({role="Officer",siteName="Company-wide"}={})=>{
+  const access=roleAccess(role);
+  const teamCard=byId("openTeam"),sitesCard=byId("openSites");
+  teamCard.hidden=!access.team;
+  sitesCard.hidden=!access.sites;
+  byId("addTeamInvite").hidden=!access.team;
+  byId("addSite").hidden=!access.team;
+  document.querySelectorAll(".edit-site").forEach(button=>button.hidden=!access.team);
+  document.querySelectorAll(".team-actions").forEach(actions=>actions.hidden=!access.team);
+  const label=byId("dashboardAccess");
+  if(label) label.textContent=role+(siteName&&siteName!=="Company-wide"?" · "+siteName:"");
+};
+const openCompanyDashboard=({companyName="Company Dashboard",workspaceSlug="",siteCount=0,teamCount=0,role="Officer",siteName="Company-wide"}={})=>{
   byId("publicHome").hidden=true;
   byId("companyDashboard").hidden=false;
   byId("dashboardCompanyName").textContent=companyName||"Company Dashboard";
   byId("dashboardWorkspace").textContent=workspaceSlug||"—";
   byId("dashboardSites").textContent=String(siteCount);
-  byId("dashboardTeam").textContent=String(teamCount);
+  byId("dashboardTeam").textContent=String(teamCount);\n  applyRoleAccess({role,siteName});
   window.scrollTo({top:0,behavior:"smooth"});
 };
 
@@ -101,10 +125,10 @@ const renderSites=sites=>{
 const refreshSites=async()=>{
   if(!currentDashboard)return;
   const sites=await listSites(currentDashboard.companyId);
-  renderSites(sites);byId("dashboardSites").textContent=String(sites.length);
+  renderSites(sites);byId("dashboardSites").textContent=String(sites.length);applyRoleAccess(currentDashboard);
   return sites;
 };
-const openSitesView=async()=>{byId("companyDashboard").hidden=true;sitesView.hidden=false;window.scrollTo({top:0});await refreshSites()};
+const openSitesView=async()=>{if(!roleAccess(currentDashboard?.role).sites)return;byId("companyDashboard").hidden=true;sitesView.hidden=false;window.scrollTo({top:0});await refreshSites()};
 byId("openSites").addEventListener("click",openSitesView);
 byId("openSites").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")openSitesView()});
 byId("backDashboard").addEventListener("click",()=>{sitesView.hidden=true;byId("companyDashboard").hidden=false;window.scrollTo({top:0})});
@@ -120,9 +144,9 @@ const renderTeam=invites=>{
 };
 const refreshTeam=async()=>{
   if(!currentDashboard)return;
-  const invites=await listInvitations(currentDashboard.companyId);renderTeam(invites);byId("dashboardTeam").textContent=String(invites.length);return invites;
+  const invites=await listInvitations(currentDashboard.companyId);renderTeam(invites);byId("dashboardTeam").textContent=String(invites.length);applyRoleAccess(currentDashboard);return invites;
 };
-const openTeamView=async()=>{byId("companyDashboard").hidden=true;sitesView.hidden=true;teamView.hidden=false;window.scrollTo({top:0});await refreshTeam()};
+const openTeamView=async()=>{if(!roleAccess(currentDashboard?.role).team)return;byId("companyDashboard").hidden=true;sitesView.hidden=true;teamView.hidden=false;window.scrollTo({top:0});await refreshTeam()};
 byId("openTeam").addEventListener("click",openTeamView);
 byId("openTeam").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")openTeamView()});
 byId("backTeamDashboard").addEventListener("click",()=>{teamView.hidden=true;byId("companyDashboard").hidden=false;window.scrollTo({top:0})});
