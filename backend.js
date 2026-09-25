@@ -1,7 +1,7 @@
 // ISS backend foundation: Firebase Authentication + Firestore tenant persistence.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
 const app=initializeApp(firebaseConfig);
@@ -42,6 +42,16 @@ export async function getDashboardData(uid){
   if(!companySnap.exists()) return null;
   const company=companySnap.data();
   return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount:sitesSnap.size,teamCount:invitesSnap.size};
+}
+
+export async function listSites(companyId){
+  const snap=await getDocs(collection(db,"companies",companyId,"sites"));
+  return snap.docs.map(item=>({id:item.id,...item.data()}));
+}
+export async function saveSite(companyId,site){
+  const payload={name:site.name,clientName:site.clientName||"",address:site.address||"",timezone:site.timezone||"Europe/London",contact:site.contact||"",status:site.status||"setup",updatedAt:serverTimestamp()};
+  if(site.id){await setDoc(doc(db,"companies",companyId,"sites",site.id),payload,{merge:true});return site.id}
+  const ref=await addDoc(collection(db,"companies",companyId,"sites"),{...payload,createdAt:serverTimestamp()});return ref.id;
 }
 
 export const signIn=(email,password)=>signInWithEmailAndPassword(auth,email,password);
