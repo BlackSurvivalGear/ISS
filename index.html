@@ -15,7 +15,7 @@
     <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" title="Switch theme"><span class="sun">☀</span><span class="moon">☾</span></button><button class="menu" aria-label="Open menu">☰</button>
   </header>
 
-  <main>
+  <main id="publicHome">
     <section class="hero">
       <picture class="hero-logo-wrap"><source srcset="ISSLight.png" media="(prefers-color-scheme: light)" id="themeLogoSource"><img src="ISS.png" alt="ImoTech Security Solutions" class="hero-logo" id="heroLogo"></picture>
       <p class="eyebrow">SECURITY OPERATIONS</p>
@@ -47,6 +47,23 @@
         <article><b>04</b><h3>Site Procedures</h3><p>Digital opening, closing and operational checklists.</p></article>
       </div>
     </section>
+  </main>
+  <main id="companyDashboard" hidden>
+    <section class="status-panel company-dashboard">
+      <div class="section-heading"><div><p class="eyebrow">COMPANY WORKSPACE</p><h2 id="dashboardCompanyName">Company Dashboard</h2></div><span class="live"><i></i> SIGNED IN</span></div>
+      <div class="stats">
+        <article><span>Workspace</span><strong id="dashboardWorkspace">—</strong><small>.imotech.solutions</small></article>
+        <article><span>Sites</span><strong id="dashboardSites">1</strong><small>Security locations</small></article>
+        <article><span>Team</span><strong id="dashboardTeam">0</strong><small>Invitations configured</small></article>
+        <article><span>Status</span><strong>LIVE</strong><small>Company workspace active</small></article>
+      </div>
+    </section>
+    <section class="modules"><p class="eyebrow">OPERATIONS</p><h2>Company control centre</h2><div class="module-grid">
+      <article><b>01</b><h3>Sites</h3><p>Manage security locations and site requirements.</p></article>
+      <article><b>02</b><h3>Team</h3><p>Manage officers, supervisors and company access.</p></article>
+      <article><b>03</b><h3>Shifts & Patrols</h3><p>Configure duty periods, patrols and checkpoints.</p></article>
+      <article><b>04</b><h3>Reports</h3><p>Incidents, occurrence book and client evidence.</p></article>
+    </div></section>
   </main>
 
   <div class="modal" id="onboarding" hidden>
