@@ -1,8 +1,7 @@
 // ISS backend foundation: Firebase Authentication + Firestore tenant persistence.
-// Supply the project's public Firebase web configuration in firebase-config.js.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
 const app=initializeApp(firebaseConfig);
@@ -30,6 +29,21 @@ export async function registerCompany({account,company,workspace,site,invites,op
   await batch.commit();
   return {uid,companyId:uid,workspaceSlug:slug};
 }
+
+export async function getDashboardData(uid){
+  const userSnap=await getDoc(doc(db,"users",uid));
+  if(!userSnap.exists()) return null;
+  const companyId=userSnap.data().companyId;
+  const [companySnap,sitesSnap,invitesSnap]=await Promise.all([
+    getDoc(doc(db,"companies",companyId)),
+    getDocs(collection(db,"companies",companyId,"sites")),
+    getDocs(collection(db,"companies",companyId,"invitations"))
+  ]);
+  if(!companySnap.exists()) return null;
+  const company=companySnap.data();
+  return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount:sitesSnap.size,teamCount:invitesSnap.size};
+}
+
 export const signIn=(email,password)=>signInWithEmailAndPassword(auth,email,password);
 export const signOutUser=()=>signOut(auth);
 export const observeAuth=callback=>onAuthStateChanged(auth,callback);

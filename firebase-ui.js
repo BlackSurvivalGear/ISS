@@ -1,10 +1,10 @@
-import { registerCompany, signIn } from "./backend.js";
+import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData } from "./backend.js";
 
 const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
 
-const openCompanyDashboard=({companyName="Company Dashboard",workspaceSlug="",siteCount=1,teamCount=0}={})=>{
+const openCompanyDashboard=({companyName="Company Dashboard",workspaceSlug="",siteCount=0,teamCount=0}={})=>{
   byId("publicHome").hidden=true;
   byId("companyDashboard").hidden=false;
   byId("dashboardCompanyName").textContent=companyName||"Company Dashboard";
@@ -12,6 +12,22 @@ const openCompanyDashboard=({companyName="Company Dashboard",workspaceSlug="",si
   byId("dashboardSites").textContent=String(siteCount);
   byId("dashboardTeam").textContent=String(teamCount);
   window.scrollTo({top:0,behavior:"smooth"});
+};
+
+const openPublicHome=()=>{
+  byId("companyDashboard").hidden=true;
+  byId("publicHome").hidden=false;
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+const loadDashboard=async user=>{
+  if(!user) return null;
+  const data=await getDashboardData(user.uid);
+  if(!data) return null;
+  localStorage.setItem("iss-company-id",data.companyId);
+  localStorage.setItem("iss-workspace-slug",data.workspaceSlug);
+  openCompanyDashboard(data);
+  return data;
 };
 
 const launch=byId("launchWorkspace");
@@ -36,7 +52,7 @@ launch.addEventListener("click",async event=>{
     localStorage.setItem("iss-company-id",result.companyId);
     localStorage.setItem("iss-workspace-slug",result.workspaceSlug);
     byId("onboarding").hidden=true;
-    openCompanyDashboard({companyName:company.companyName,workspaceSlug:result.workspaceSlug,siteCount:site.siteName?1:0,teamCount:(window.ISSInvites||[]).length});
+    await loadDashboard(auth.currentUser);
   }catch(error){
     console.error(error);
     message(status,error?.message||"Could not create the company workspace.",true);
@@ -52,12 +68,25 @@ signinForm.addEventListener("submit",async event=>{
   button.disabled=true;
   message(status,"Signing in…");
   try{
-    await signIn(data.email,data.password);
+    const credential=await signIn(data.email,data.password);
+    const dashboard=await loadDashboard(credential.user);
+    if(!dashboard) throw new Error("Company workspace not found.");
     byId("signin").hidden=true;
-    openCompanyDashboard({workspaceSlug:localStorage.getItem("iss-workspace-slug")||""});
     message(status,"Signed in.");
   }catch(error){
     console.error(error);
-    message(status,"Sign-in failed. Check your email and password.",true);
+    message(status,"Sign-in failed. Check your account details.",true);
   }finally{button.disabled=false}
+});
+
+byId("dashboardSignOut").addEventListener("click",async()=>{
+  await signOutUser();
+  localStorage.removeItem("iss-company-id");
+  localStorage.removeItem("iss-workspace-slug");
+  openPublicHome();
+});
+
+observeAuth(async user=>{
+  if(!user){openPublicHome();return}
+  try{await loadDashboard(user)}catch(error){console.error("Could not restore company workspace.",error)}
 });
