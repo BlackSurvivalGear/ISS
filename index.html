@@ -60,11 +60,21 @@
     </section>
     <section class="modules"><p class="eyebrow">OPERATIONS</p><h2>Company control centre</h2><div class="module-grid">
       <article class="module-action" id="openSites" tabindex="0"><b>01</b><h3>Sites</h3><p>Manage security locations and site requirements.</p></article>
-      <article><b>02</b><h3>Team</h3><p>Manage officers, supervisors and company access.</p></article>
+      <article class="module-action" id="openTeam" tabindex="0"><b>02</b><h3>Team</h3><p>Manage officers, supervisors and company access.</p></article>
       <article><b>03</b><h3>Shifts & Patrols</h3><p>Configure duty periods, patrols and checkpoints.</p></article>
       <article><b>04</b><h3>Reports</h3><p>Incidents, occurrence book and client evidence.</p></article>
     </div></section>
   </main>
+
+  <main id="teamView" hidden>
+    <section class="status-panel sites-page">
+      <div class="section-heading"><div><p class="eyebrow">TEAM MANAGEMENT</p><h2>Invitations & Roles</h2></div><div class="actions"><button class="secondary" id="backTeamDashboard" type="button">Back to Dashboard</button><button class="primary" id="addTeamInvite" type="button">Invite Team Member</button></div></div>
+      <p class="intro sites-intro">Invite staff and control their operational role within the company workspace.</p>
+      <div id="teamList" class="sites-list"></div>
+    </section>
+  </main>
+
+  <div class="modal" id="teamEditor" hidden><div class="modal-card onboarding-card"><button class="close" id="closeTeamEditor" aria-label="Close">×</button><p class="eyebrow">TEAM ACCESS</p><h2 id="teamEditorTitle">Invite Team Member</h2><form class="account-form" id="teamEditorForm"><input type="hidden" name="id"><label>Name<input name="name" required></label><label>Work email<input type="email" name="email" required></label><label>Role<select name="role"><option>Operations Manager</option><option>Controller</option><option>Supervisor</option><option>Team Leader</option><option selected>Officer</option><option>Client</option></select></label><label>Status<select name="status"><option value="pending">Pending invitation</option><option value="active">Active</option><option value="suspended">Suspended</option></select></label><div class="role-guide"><strong>ROLE ACCESS</strong><span><b>Operations Manager</b> · Company operations and teams</span><span><b>Controller</b> · Live operations and reporting</span><span><b>Supervisor</b> · Site teams and shift oversight</span><span><b>Team Leader</b> · Shift-level team coordination</span><span><b>Officer</b> · Assigned operational duties</span><span><b>Client</b> · Client-facing access only</span></div><button class="primary form-submit" type="submit">Save Invitation</button><p class="coming" id="teamEditorMessage"></p></form></div></div>
 
   <main id="sitesView" hidden>
     <section class="status-panel sites-page">
