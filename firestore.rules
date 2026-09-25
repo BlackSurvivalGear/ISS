@@ -20,7 +20,7 @@ service cloud.firestore {
       allow read, update: if companyMember(companyId);
       allow delete: if signedIn() && request.auth.uid == resource.data.ownerUid;
       match /{document=**} {
-        allow read, write: if companyMember(companyId);
+        allow read: if companyMember(companyId);\n        allow create: if signedIn() && request.auth.uid == companyId;\n        allow update, delete: if companyMember(companyId);
       }
     }
   }
