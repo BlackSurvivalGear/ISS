@@ -143,11 +143,12 @@
       <img src="favi%20(1).png" alt="ISS" class="modal-logo">
       <p class="eyebrow">SECURITY SIGN-IN</p>
       <h2>Sign in to your company</h2>
-      <p class="form-intro">Existing owners, managers and invited staff will sign in here when authentication is connected.</p><p class="coming">Company authentication will be connected in a later stage.</p>
+      <p class="form-intro">Sign in with your company account to access your ISS workspace.</p><form class="account-form" id="signinForm"><label>Work email<input type="email" name="email" autocomplete="email" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label><button class="primary form-submit" type="submit">Sign In</button></form><p class="coming" id="signinMessage">Secure company authentication</p>
     </div>
   </div>
 
   <footer>© 2026 ImoTech Security Solutions <span>Secure Today. Protect Tomorrow.</span></footer>
   <script src="app.js"></script>
+  <script type="module" src="firebase-ui.js"></script>
 </body>
 </html>
