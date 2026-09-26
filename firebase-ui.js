@@ -3,8 +3,6 @@ import { registerCompany, getDashboardData, listSites, saveSite, listInvitations
 const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
-const SUPERADMIN_EMAIL="admin@lawal.org";
-const isSuperAdmin=user=>String(user?.email||"").toLowerCase()===SUPERADMIN_EMAIL;
 const setHeaderUser=(user,data={})=>{
   const account=byId("userAccount");
   if(!user){account.hidden=true;return}
