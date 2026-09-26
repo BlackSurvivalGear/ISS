@@ -94,7 +94,7 @@ const renderPlatform=async()=>{
   byId("platformCompanyList").innerHTML=data.companies.length?data.companies.map(company=>'<article class="admin-company"><div><span class="admin-status">'+escapeHtml(company.status)+'</span><h3>'+escapeHtml(company.name)+'</h3><p>'+escapeHtml(company.workspaceSlug?company.workspaceSlug+".imotech.solutions":"No workspace")+'</p></div><div><small>CONTACT</small><span>'+escapeHtml(company.email||"Not set")+'</span><small>'+escapeHtml(company.country||"Country not set")+'</small></div><div class="company-metrics"><div><strong>'+company.siteCount+'</strong><span>Sites</span></div><div><strong>'+company.employeeCount+'</strong><span>Employees</span></div><div><strong>'+company.pendingInvites+'</strong><span>Pending</span></div></div><div><small>REGISTRATION</small><span>'+escapeHtml(company.registrationNumber||"Not set")+'</span><small>'+escapeHtml(company.phone||"No phone")+'</small></div></article>').join(""):'<div class="empty-sites">No companies registered.</div>';
 };
 byId("platformCompanyFilter").addEventListener("change",renderPlatformUsers);
-byId("platformRoleFilter").addEventListener("change",renderPlatformUsers);
+byId("platformRoleFilter").addEventListener("change",renderPlatformUsers);\nbyId("platformNameFilter").addEventListener("input",renderPlatformUsers);
 const openSuperadminDashboard=async()=>{
   if(!isSuperAdmin(auth.currentUser))return;
   byId("publicHome").hidden=true;
