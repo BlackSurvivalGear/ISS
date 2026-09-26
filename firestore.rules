@@ -1,7 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn(){ return request.auth != null; }\n    function superAdmin(){ return signedIn() && request.auth.token.email == "admin@lawal.org"; }
+    function signedIn(){ return request.auth != null; }
+    function superAdmin(){ return signedIn() && request.auth.token.email == "admin@lawal.org"; }
     function userDoc(){ return get(/databases/$(database)/documents/users/$(request.auth.uid)); }
     function companyMember(companyId){ return signedIn() && userDoc().data.companyId == companyId && userDoc().data.status == "active"; }
     function invite(companyId, invitationId){ return get(/databases/$(database)/documents/companies/$(companyId)/invitations/$(invitationId)); }
@@ -32,7 +33,8 @@ service cloud.firestore {
     }
     match /companies/{companyId} {
       allow create: if signedIn() && request.auth.uid == companyId && request.resource.data.ownerUid == request.auth.uid;
-      allow read: if superAdmin() || companyMember(companyId);\n      allow update: if companyMember(companyId);
+      allow read: if superAdmin() || companyMember(companyId);
+      allow update: if companyMember(companyId);
       allow delete: if signedIn() && request.auth.uid == resource.data.ownerUid;
       match /invitations/{invitationId} {
         allow read: if superAdmin() || companyMember(companyId) || (signedIn() && resource.data.email == request.auth.token.email);
@@ -41,7 +43,7 @@ service cloud.firestore {
         allow delete: if companyMember(companyId);
       }
       match /{document=**} {
-        allow read: if companyMember(companyId);
+        allow read: if superAdmin() || companyMember(companyId);
         allow create: if signedIn() && request.auth.uid == companyId;
         allow update, delete: if companyMember(companyId);
       }
