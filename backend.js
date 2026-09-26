@@ -27,6 +27,10 @@ export async function registerCompany({account,company,workspace,site,invites,op
   return {uid,companyId:uid,workspaceSlug:slug};
 }
 
+export async function updateUserProfile(uid,{firstName,lastName}){
+  await updateDoc(doc(db,"users",uid),{firstName:String(firstName||"").trim(),lastName:String(lastName||"").trim(),updatedAt:serverTimestamp()});
+}
+
 export async function getDashboardData(uid){
   const userSnap=await getDoc(doc(db,"users",uid));
   if(!userSnap.exists()) return null;

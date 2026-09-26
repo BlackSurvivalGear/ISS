@@ -15,7 +15,14 @@
     <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" title="Switch theme"><span class="sun">☀</span><span class="moon">☾</span></button>
     <div class="header-spacer"></div>
     <button class="secondary superadmin-launch" id="superadminLaunch" type="button" hidden>Platform Admin</button>
-    <div class="user-account" id="userAccount" hidden><span class="user-avatar" id="userAvatar">U</span><span class="user-copy"><strong id="userName">User</strong><small id="userEmail"></small></span></div>
+    <div class="user-account" id="userAccount" hidden>
+      <button class="user-trigger" id="userTrigger" type="button" aria-haspopup="true" aria-expanded="false"><span class="user-avatar" id="userAvatar">U</span><span class="user-copy"><strong id="userName">User</strong><small id="userEmail"></small></span><span class="user-chevron">▾</span></button>
+      <div class="profile-menu" id="profileMenu" hidden>
+        <div class="profile-summary"><strong id="profileName">User</strong><span id="profileEmail"></span><small id="profileRole"></small><small id="profileCompany"></small></div>
+        <button type="button" id="editProfile">Edit Profile</button>
+        <button type="button" id="profileSignOut">Sign Out</button>
+      </div>
+    </div>
     <button class="menu" aria-label="Open menu">☰</button>
   </header>
 
@@ -214,5 +221,6 @@
   <footer>© 2026 ImoTech Security Solutions <span>Secure Today. Protect Tomorrow.</span></footer>
   <script src="app.js"></script>
   <script type="module" src="firebase-ui.js"></script>
+<div class="modal" id="profileEditor" hidden><div class="modal-card"><div class="modal-head"><div><p class="eyebrow">ACCOUNT</p><h2>Edit Profile</h2></div><button type="button" class="icon-btn" id="closeProfileEditor" aria-label="Close">×</button></div><form id="profileForm"><label>First name<input name="firstName" required></label><label>Last name<input name="lastName"></label><label>Email<input name="email" type="email" readonly></label><div class="form-actions"><button class="primary" type="submit">Save Profile</button></div><p class="form-message" id="profileMessage"></p></form></div></div>
 </body>
 </html>
