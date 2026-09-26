@@ -1,6 +1,6 @@
 // ISS data backend: Firestore tenant persistence.
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, where, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { app, auth } from "./firebase-core.js";
 
 export const db=getFirestore(app);
@@ -146,7 +146,27 @@ export async function acceptInvitation({companyId,invitationId,email,password}){
 }
 
 export async function setInvitationStatus(companyId,id,status){
-  await updateDoc(doc(db,"companies",companyId,"invitations",id),{status,updatedAt:serverTimestamp()});
+  const inviteRef=doc(db,"companies",companyId,"invitations",id);
+  const inviteSnap=await getDoc(inviteRef);
+  if(!inviteSnap.exists()) throw new Error("Team member not found.");
+  const invite=inviteSnap.data();
+  const acceptedUid=invite.acceptedUid||"";
+  const batch=writeBatch(db);
+  batch.update(inviteRef,{status,updatedAt:serverTimestamp()});
+  if(acceptedUid) batch.update(doc(db,"users",acceptedUid),{status,updatedAt:serverTimestamp()});
+  await batch.commit();
+}
+
+export async function deleteTeamMember(companyId,id){
+  const inviteRef=doc(db,"companies",companyId,"invitations",id);
+  const inviteSnap=await getDoc(inviteRef);
+  if(!inviteSnap.exists()) throw new Error("Team member not found.");
+  const invite=inviteSnap.data();
+  if(invite.status!=="suspended") throw new Error("Suspend the team member before deleting.");
+  const batch=writeBatch(db);
+  batch.delete(inviteRef);
+  if(invite.acceptedUid) batch.delete(doc(db,"users",invite.acceptedUid));
+  await batch.commit();
 }
 
 export const signIn=(email,password)=>signInWithEmailAndPassword(auth,email,password);
