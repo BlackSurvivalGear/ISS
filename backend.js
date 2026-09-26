@@ -131,9 +131,14 @@ export async function createShift(companyId,shift){
     cursor.setDate(cursor.getDate()+1);
   }
   if(!dates.length) throw new Error("No shifts fall within that recurrence.");
+  if(dates.length>400) throw new Error("Recurring series is too large.");
   const seriesId=recurrence==="none"?null:(auth.currentUser.uid+"-"+Date.now());
-  const refs=[];
-  for(const date of dates){const ref=await addDoc(collection(db,"companies",companyId,"shifts"),{siteId:shift.siteId,siteName:shift.siteName||"",date,startTime:shift.startTime,endTime:shift.endTime,positions:Number(shift.positions)||1,requiredRole:shift.requiredRole||"Officer",notes:shift.notes||"",assignments:[],status:"open",recurrence,seriesId,createdBy:auth.currentUser.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});refs.push(ref.id)}
+  const batch=writeBatch(db),refs=[];
+  for(const date of dates){
+    const ref=doc(collection(db,"companies",companyId,"shifts"));refs.push(ref.id);
+    batch.set(ref,{siteId:shift.siteId,siteName:shift.siteName||"",date,startTime:shift.startTime,endTime:shift.endTime,positions:Number(shift.positions)||1,requiredRole:shift.requiredRole||"Officer",notes:shift.notes||"",assignments:[],status:"open",recurrence,seriesId,createdBy:auth.currentUser.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+  }
+  await batch.commit();
   return {ids:refs,count:refs.length};
 }
 export async function deleteShift(companyId,shiftId){
