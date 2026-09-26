@@ -225,7 +225,7 @@ export async function listInvitations(companyId){
   return snap.docs.map(item=>({id:item.id,...item.data()}));
 }
 export async function saveInvitation(companyId,invite){
-  const payload={name:invite.name||"",email:String(invite.email||"").trim().toLowerCase(),role:invite.role||"Officer",siteId:invite.siteId||"company-wide",siteName:invite.siteName||"Company-wide",status:invite.status||"pending",updatedAt:serverTimestamp()};
+  const payload={name:invite.name||"",email:String(invite.email||"").trim().toLowerCase(),phone:String(invite.phone||"").trim(),role:invite.role||"Officer",siteId:invite.siteId||"company-wide",siteName:invite.siteName||"Company-wide",status:invite.status||"pending",updatedAt:serverTimestamp()};
   if(invite.id){await setDoc(doc(db,"companies",companyId,"invitations",invite.id),payload,{merge:true});return invite.id}
   const ref=await addDoc(collection(db,"companies",companyId,"invitations"),{...payload,createdAt:serverTimestamp()});return ref.id;
 }
@@ -239,7 +239,7 @@ export async function acceptInvitation({companyId,invitationId,email,password}){
   if(String(invite.email||"").toLowerCase()!==String(email||"").toLowerCase()) throw new Error("Use the email address that was invited.");
   if(invite.status==="suspended") throw new Error("This invitation has been suspended.");
   const batch=writeBatch(db);
-  batch.set(doc(db,"users",uid),{companyId,email:String(email).toLowerCase(),firstName:invite.name||"",lastName:"",role:invite.role||"Officer",siteId:invite.siteId||"company-wide",siteName:invite.siteName||"Company-wide",status:"active",invitationId,createdAt:serverTimestamp()});
+  batch.set(doc(db,"users",uid),{companyId,email:String(email).toLowerCase(),firstName:invite.name||"",lastName:"",phone:invite.phone||"",role:invite.role||"Officer",siteId:invite.siteId||"company-wide",siteName:invite.siteName||"Company-wide",status:"active",invitationId,createdAt:serverTimestamp()});
   batch.update(inviteRef,{status:"active",acceptedUid:uid,acceptedAt:serverTimestamp(),updatedAt:serverTimestamp()});
   await batch.commit();
   return {uid,companyId};
