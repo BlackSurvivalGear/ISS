@@ -63,6 +63,7 @@ const openPublicHome=()=>{
 const loadDashboard=async user=>{
   if(!user) return null;
   if(isSuperAdmin(user)){
+    setHeaderUser(user,{firstName:"Platform",lastName:"Admin",email:user.email});
     byId("superadminLaunch").hidden=false;
     openPublicHome();
     return {superadmin:true};
@@ -74,6 +75,7 @@ const loadDashboard=async user=>{
   localStorage.setItem("iss-workspace-slug",data.workspaceSlug);
   openCompanyDashboard(data);
   currentDashboard=data;
+  setHeaderUser(user,data);
   return data;
 };
 
