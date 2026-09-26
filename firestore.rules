@@ -43,10 +43,10 @@ service cloud.firestore {
       match /shifts/{shiftId} {
         allow read: if superAdmin() || companyMember(companyId);
         allow create: if companyMember(companyId)
-          && userDoc().data.role in ["Company Owner", "Operations Manager", "Controller", "Supervisor"];
+          && userDoc().data.role in ["Company Owner", "company_owner", "Operations Manager", "operations_manager", "Controller", "controller", "Supervisor", "supervisor"];
         allow update: if companyMember(companyId);
         allow delete: if companyOwner(companyId)
-          || (companyMember(companyId) && userDoc().data.role in ["Operations Manager", "Controller"]);
+          || (companyMember(companyId) && userDoc().data.role in ["Operations Manager", "operations_manager", "Controller", "controller"]);
       }
       match /sites/{siteId} {
         allow read: if superAdmin() || companyMember(companyId);
