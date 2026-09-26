@@ -121,6 +121,9 @@ export async function listShifts(companyId){
 export async function createShift(companyId,shift){
   return (await addDoc(collection(db,"companies",companyId,"shifts"),{siteId:shift.siteId,siteName:shift.siteName||"",date:shift.date,startTime:shift.startTime,endTime:shift.endTime,positions:Number(shift.positions)||1,requiredRole:shift.requiredRole||"Officer",notes:shift.notes||"",assignments:[],status:"open",createdBy:auth.currentUser.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()})).id;
 }
+export async function deleteShift(companyId,shiftId){
+  await deleteDoc(doc(db,"companies",companyId,"shifts",shiftId));
+}
 export async function updateShift(companyId,shiftId,changes){
   const ref=doc(db,"companies",companyId,"shifts",shiftId),snap=await getDoc(ref);
   if(!snap.exists()) throw new Error("Shift not found.");
