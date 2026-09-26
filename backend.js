@@ -1,11 +1,8 @@
-// ISS backend foundation: Firebase Authentication + Firestore tenant persistence.
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+// ISS data backend: Firestore tenant persistence.
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js";
+import { app, auth } from "./firebase-core.js";
 
-const app=initializeApp(firebaseConfig);
-export const auth=getAuth(app);
 export const db=getFirestore(app);
 
 const cleanSlug=value=>String(value||"").toLowerCase().trim().replace(/[^a-z0-9-]/g,"").replace(/^-+|-+$/g,"");
