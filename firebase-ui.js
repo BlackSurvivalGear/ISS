@@ -26,8 +26,10 @@ const setHeaderUser=(user,data={})=>{
 const profileMenu=byId("profileMenu"),userTrigger=byId("userTrigger"),profileEditor=byId("profileEditor"),profileForm=byId("profileForm");
 const setProfileMenu=open=>{profileMenu.hidden=!open;userTrigger.setAttribute("aria-expanded",String(open))};
 userTrigger.addEventListener("click",e=>{e.stopPropagation();setProfileMenu(profileMenu.hidden)});
-byId("userAccount").addEventListener("mouseenter",()=>{if(matchMedia("(hover:hover)").matches)setProfileMenu(true)});
-byId("userAccount").addEventListener("mouseleave",()=>{if(matchMedia("(hover:hover)").matches)setProfileMenu(false)});
+let profileCloseTimer;
+byId("userAccount").addEventListener("mouseenter",()=>{if(matchMedia("(hover:hover)").matches){clearTimeout(profileCloseTimer);setProfileMenu(true)}});
+byId("userAccount").addEventListener("mouseleave",()=>{if(matchMedia("(hover:hover)").matches){clearTimeout(profileCloseTimer);profileCloseTimer=setTimeout(()=>setProfileMenu(false),180)}});
+profileMenu.addEventListener("mouseenter",()=>clearTimeout(profileCloseTimer));
 document.addEventListener("click",e=>{if(!byId("userAccount").contains(e.target))setProfileMenu(false)});
 byId("profileSignOut").addEventListener("click",async()=>{setProfileMenu(false);await signOutUser();localStorage.removeItem("iss-company-id");localStorage.removeItem("iss-workspace-slug");openPublicHome()});
 byId("editProfile").addEventListener("click",()=>{setProfileMenu(false);profileForm.elements.firstName.value=byId("userAccount").dataset.firstName||"";profileForm.elements.lastName.value=byId("userAccount").dataset.lastName||"";profileForm.elements.email.value=auth.currentUser?.email||"";profileEditor.hidden=false});
