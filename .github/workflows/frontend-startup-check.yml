@@ -1,0 +1,19 @@
+name: Frontend startup checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check browser modules
+        run: |
+          node --input-type=module --check < auth-bootstrap.js
+          node --input-type=module --check < firebase-ui.js
+          node --input-type=module --check < backend.js
+          node --input-type=module --check < auth-service.js
+          node --input-type=module --check < firebase-core.js
+      - name: Check classic JavaScript
+        run: node --check app.js
