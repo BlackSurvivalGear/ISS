@@ -6,8 +6,9 @@ let currentDashboard=null;
 const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
 const setHeaderUser=(user,data={})=>{
-  const account=byId("userAccount");
-  if(!user){account.hidden=true;return}
+  const account=byId("userAccount"),publicActions=byId("publicHeaderActions");
+  if(!user){account.hidden=true;if(publicActions)publicActions.hidden=false;return}
+  if(publicActions)publicActions.hidden=true;
   const email=data.email||user.email||"";
   const fullName=[data.firstName,data.lastName].filter(Boolean).join(" ").trim();
   const displayName=fullName||user.displayName||email.split("@")[0]||"User";
@@ -59,6 +60,8 @@ const applyRoleAccess=({role="Officer",siteName="Company-wide"}={})=>{
 };
 const openCompanyDashboard=({companyName="Company Dashboard",workspaceSlug="",siteCount=0,teamCount=0,role="Officer",siteName="Company-wide"}={})=>{
   byId("publicHome").hidden=true;
+  byId("signin").hidden=true;
+  byId("onboarding").hidden=true;
   byId("companyDashboard").hidden=false;
   byId("dashboardCompanyName").textContent=companyName||"Company Dashboard";
   byId("dashboardWorkspace").textContent=workspaceSlug||"—";
