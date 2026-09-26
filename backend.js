@@ -152,6 +152,21 @@ export async function updateShift(companyId,shiftId,changes){
   if(assignments.length>positions) throw new Error("Positions cannot be lower than the number of assigned officers.");
   await updateDoc(ref,{siteId:changes.siteId,siteName:changes.siteName||"",date:changes.date,startTime:changes.startTime,endTime:changes.endTime,positions,requiredRole:changes.requiredRole||"Officer",notes:changes.notes||"",assignments,status:assignments.length>=positions?"filled":"open",updatedAt:serverTimestamp()});
 }
+export async function updateRecurringSeries(companyId,shiftId,changes,scope){
+  const currentRef=doc(db,"companies",companyId,"shifts",shiftId),currentSnap=await getDoc(currentRef);
+  if(!currentSnap.exists()) throw new Error("Shift not found.");
+  const current=currentSnap.data();
+  if(!current.seriesId) return updateShift(companyId,shiftId,changes);
+  const all=await getDocs(query(collection(db,"companies",companyId,"shifts"),where("seriesId","==",current.seriesId)));
+  const targets=all.docs.filter(item=>scope==="all"||(scope==="future"&&item.data().date>=current.date));
+  const batch=writeBatch(db);
+  for(const item of targets){
+    const data=item.data(),patch={siteId:changes.siteId,siteName:changes.siteName||"",startTime:changes.startTime,endTime:changes.endTime,positions:Number(changes.positions)||1,requiredRole:changes.requiredRole||"Officer",notes:changes.notes||"",recurrence:changes.recurrence||data.recurrence,repeatUntil:changes.repeatUntil||null,updatedAt:serverTimestamp()};
+    batch.update(item.ref,patch);
+  }
+  await batch.commit();
+  return targets.length;
+}
 export async function listCompanyMembers(companyId){
   const snap=await getDocs(query(collection(db,"users"),where("companyId","==",companyId)));
   return snap.docs.map(item=>({uid:item.id,...item.data()}));
