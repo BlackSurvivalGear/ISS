@@ -5,6 +5,18 @@ const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
 const SUPERADMIN_EMAIL="admin@lawal.org";
 const isSuperAdmin=user=>String(user?.email||"").toLowerCase()===SUPERADMIN_EMAIL;
+const setHeaderUser=(user,data={})=>{
+  const account=byId("userAccount");
+  if(!user){account.hidden=true;return}
+  const email=data.email||user.email||"";
+  const fullName=[data.firstName,data.lastName].filter(Boolean).join(" ").trim();
+  const displayName=fullName||user.displayName||email.split("@")[0]||"User";
+  const initials=(fullName?fullName.split(/\s+/).map(part=>part[0]).join(""):displayName.slice(0,2)).slice(0,2).toUpperCase();
+  byId("userAvatar").textContent=initials||"U";
+  byId("userName").textContent=displayName;
+  byId("userEmail").textContent=email;
+  account.hidden=false;
+};
 
 const ROLE_ACCESS={
   "Company Owner":{sites:true,team:true},
@@ -85,7 +97,7 @@ const openSuperadminDashboard=async()=>{
   await renderPlatform();
 };
 byId("superadminLaunch").addEventListener("click",openSuperadminDashboard);
-byId("superadminSignOut").addEventListener("click",async()=>{await signOutUser();byId("superadminLaunch").hidden=true;openPublicHome()});
+byId("superadminSignOut").addEventListener("click",async()=>{await signOutUser();setHeaderUser(null);byId("superadminLaunch").hidden=true;openPublicHome()});
 
 const launch=byId("launchWorkspace");
 launch.addEventListener("click",async event=>{
@@ -144,7 +156,7 @@ byId("dashboardSignOut").addEventListener("click",async()=>{
 });
 
 observeAuth(async user=>{
-  if(!user){byId("superadminLaunch").hidden=true;openPublicHome();return}
+  if(!user){byId("superadminLaunch").hidden=true;setHeaderUser(null);openPublicHome();return}
   try{await loadDashboard(user)}catch(error){console.error("Could not restore company workspace.",error)}
 });
 
