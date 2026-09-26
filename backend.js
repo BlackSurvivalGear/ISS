@@ -44,6 +44,61 @@ export async function getDashboardData(uid){
   const user=userSnap.data();\n  return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount:sitesSnap.size,teamCount:invitesSnap.size,role:user.role||"Officer",siteId:user.siteId||"company-wide",siteName:user.siteName||"Company-wide"};
 }
 
+export async function getPlatformOverview(){
+  const [companiesSnap,usersSnap]=await Promise.all([
+    getDocs(collection(db,"companies")),
+    getDocs(collection(db,"users"))
+  ]);
+  const users=usersSnap.docs.map(item=>({id:item.id,...item.data()}));
+  const companies=await Promise.all(companiesSnap.docs.map(async item=>{
+    const company=item.data();
+    const [sitesSnap,invitesSnap]=await Promise.all([
+      getDocs(collection(db,"companies",item.id,"sites")),
+      getDocs(collection(db,"companies",item.id,"invitations"))
+    ]);
+    const members=users.filter(user=>user.companyId===item.id);
+    const invites=invitesSnap.docs.map(invite=>invite.data());
+    return {
+      id:item.id,
+      name:company.name||"Unnamed company",
+      tradingName:company.tradingName||"",
+      workspaceSlug:company.workspaceSlug||"",
+      country:company.country||"",
+      email:company.email||"",
+      phone:company.phone||"",
+      website:company.website||"",
+      registrationNumber:company.registrationNumber||"",
+      status:company.status||"active",
+      createdAt:company.createdAt?.toDate?.()?.toISOString?.()||"",
+      siteCount:sitesSnap.size,
+      employeeCount:members.length,
+      activeUsers:members.filter(user=>user.status==="active").length,
+      suspendedUsers:members.filter(user=>user.status==="suspended").length,
+      pendingInvites:invites.filter(invite=>invite.status==="pending").length,
+      suspendedInvites:invites.filter(invite=>invite.status==="suspended").length
+    };
+  }));
+  const now=Date.now(),week=7*24*60*60*1000;
+  const alerts=[];
+  companies.forEach(company=>{
+    if(company.createdAt&&now-new Date(company.createdAt).getTime()<=week) alerts.push({type:"New Company",company:company.name,detail:"Registered within the last 7 days"});
+    if(company.siteCount===0||company.activeUsers===0) alerts.push({type:"Incomplete Setup",company:company.name,detail:company.siteCount===0?"No sites configured":"No active team accounts"});
+    if(company.pendingInvites>0) alerts.push({type:"Pending Invitations",company:company.name,detail:company.pendingInvites+" pending"});
+    const suspended=company.suspendedUsers+company.suspendedInvites;
+    if(suspended>0) alerts.push({type:"Suspended Accounts",company:company.name,detail:suspended+" suspended"});
+  });
+  return {
+    companies,
+    alerts,
+    totals:{
+      companies:companies.length,
+      sites:companies.reduce((sum,item)=>sum+item.siteCount,0),
+      employees:companies.reduce((sum,item)=>sum+item.employeeCount,0),
+      alerts:alerts.length
+    }
+  };
+}
+
 export async function listSites(companyId){
   const snap=await getDocs(collection(db,"companies",companyId,"sites"));
   return snap.docs.map(item=>({id:item.id,...item.data()}));
