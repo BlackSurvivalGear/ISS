@@ -103,6 +103,7 @@ const renderPlatformUsers=()=>{
 };
 const renderPlatform=async()=>{
   const data=await getPlatformOverview();
+  platformData=data;
   byId("platformCompanies").textContent=String(data.totals.companies);
   byId("platformSites").textContent=String(data.totals.sites);
   byId("platformEmployees").textContent=String(data.totals.employees);
