@@ -171,12 +171,14 @@ byId("dashboardSignOut").addEventListener("click",async()=>{
   openPublicHome();
 });
 
+let currentDashboard=null;
+
 observeAuth(async user=>{
   if(!user){byId("superadminLaunch").hidden=true;setHeaderUser(null);openPublicHome();return}
   try{await loadDashboard(user)}catch(error){console.error("Could not restore company workspace.",error)}
 });
 
-let currentDashboard=null;
+
 const sitesView=byId("sitesView"),siteEditor=byId("siteEditor"),siteFormEditor=byId("siteEditorForm");
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const renderSites=sites=>{
