@@ -2,7 +2,9 @@ import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardDa
 
 const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
-const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};\nconst SUPERADMIN_EMAIL="admin@lawal.org";\nconst isSuperAdmin=user=>String(user?.email||"").toLowerCase()===SUPERADMIN_EMAIL;
+const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
+const SUPERADMIN_EMAIL="admin@lawal.org";
+const isSuperAdmin=user=>String(user?.email||"").toLowerCase()===SUPERADMIN_EMAIL;
 
 const ROLE_ACCESS={
   "Company Owner":{sites:true,team:true},
@@ -34,12 +36,14 @@ const openCompanyDashboard=({companyName="Company Dashboard",workspaceSlug="",si
   byId("dashboardCompanyName").textContent=companyName||"Company Dashboard";
   byId("dashboardWorkspace").textContent=workspaceSlug||"—";
   byId("dashboardSites").textContent=String(siteCount);
-  byId("dashboardTeam").textContent=String(teamCount);\n  applyRoleAccess({role,siteName});
+  byId("dashboardTeam").textContent=String(teamCount);
+  applyRoleAccess({role,siteName});
   window.scrollTo({top:0,behavior:"smooth"});
 };
 
 const openPublicHome=()=>{
   byId("companyDashboard").hidden=true;
+  byId("superadminDashboard").hidden=true;
   byId("publicHome").hidden=false;
   window.scrollTo({top:0,behavior:"smooth"});
 };
@@ -140,7 +144,7 @@ byId("dashboardSignOut").addEventListener("click",async()=>{
 });
 
 observeAuth(async user=>{
-  if(!user){openPublicHome();return}
+  if(!user){byId("superadminLaunch").hidden=true;openPublicHome();return}
   try{await loadDashboard(user)}catch(error){console.error("Could not restore company workspace.",error)}
 });
 
