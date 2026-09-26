@@ -102,3 +102,7 @@ body.light #profileForm input{background:#fff;color:#15293a;border-color:#9db6c8
 
 /* Native shift date/time picker affordance */
 .native-picker{cursor:pointer;color-scheme:dark}.native-picker::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.85;filter:none}.native-picker:hover::-webkit-calendar-picker-indicator{opacity:1}body.light .native-picker{color-scheme:light}
+
+
+/* Duty Rota month navigation */
+.rota-month-toolbar{justify-content:flex-end}.rota-month-toolbar .rota-month-arrow{width:42px;height:42px;padding:0;font-size:24px;line-height:1}.rota-month-label{min-width:150px;text-align:center;font-size:15px;letter-spacing:.02em;color:var(--text)}body.light .rota-month-label{color:#17334c}@media(max-width:520px){.rota-month-toolbar{justify-content:center}.rota-month-label{min-width:130px}}
