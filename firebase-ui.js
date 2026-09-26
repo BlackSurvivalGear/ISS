@@ -2,6 +2,7 @@ import { registerCompany, getDashboardData, listSites, saveSite, deleteSite, lis
 import { auth, signIn, signOutUser, observeAuth, isSuperAdmin } from "./auth-service.js";
 
 const byId=id=>document.getElementById(id);
+let currentDashboard=null;
 const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
 const setHeaderUser=(user,data={})=>{
@@ -260,7 +261,6 @@ signinForm.addEventListener("submit",async event=>{
 
 byId("dashboardSignOut").hidden=true;
 
-let currentDashboard=null;
 
 observeAuth(async user=>{
   if(!user){byId("superadminLaunch").hidden=true;setHeaderUser(null);openPublicHome();return}
