@@ -122,6 +122,9 @@ export async function createShift(companyId,shift){
   return (await addDoc(collection(db,"companies",companyId,"shifts"),{siteId:shift.siteId,siteName:shift.siteName||"",date:shift.date,startTime:shift.startTime,endTime:shift.endTime,positions:Number(shift.positions)||1,requiredRole:shift.requiredRole||"Officer",notes:shift.notes||"",assignments:[],status:"open",createdBy:auth.currentUser.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()})).id;
 }
 export async function claimShift(companyId,shiftId,user){
+  const membership=await getDoc(doc(db,"users",user.uid));
+  const role=String(membership.data()?.role||"").trim().toLowerCase().replace(/[_-]+/g," ").replace(/\s+/g," ");
+  if(["company owner","operations manager","controller","supervisor"].includes(role)) throw new Error("Management accounts cannot self-book shifts.");
   const ref=doc(db,"companies",companyId,"shifts",shiftId),snap=await getDoc(ref);
   if(!snap.exists())throw new Error("Shift not found.");
   const shift=snap.data(),assignments=Array.isArray(shift.assignments)?shift.assignments:[];
