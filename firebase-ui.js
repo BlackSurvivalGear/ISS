@@ -85,9 +85,16 @@ const renderPlatform=async()=>{
   byId("platformSites").textContent=String(data.totals.sites);
   byId("platformEmployees").textContent=String(data.totals.employees);
   byId("platformAlerts").textContent=String(data.totals.alerts);
+  const companyFilter=byId("platformCompanyFilter"),roleFilter=byId("platformRoleFilter");
+  companyFilter.innerHTML='<option value="">All companies</option>'+data.companies.map(company=>'<option value="'+escapeHtml(company.id)+'">'+escapeHtml(company.name)+'</option>').join("");
+  const roles=[...new Set(data.users.map(user=>user.role))].sort();
+  roleFilter.innerHTML='<option value="">All roles</option>'+roles.map(role=>'<option value="'+escapeHtml(role)+'">'+escapeHtml(role)+'</option>').join("");
+  renderPlatformUsers();
   byId("platformAlertList").innerHTML=data.alerts.length?data.alerts.map(alert=>'<article class="admin-alert"><strong>'+escapeHtml(alert.type)+'</strong><span>'+escapeHtml(alert.company)+'</span><small>'+escapeHtml(alert.detail)+'</small></article>').join(""):'<div class="empty-sites">No platform alerts.</div>';
   byId("platformCompanyList").innerHTML=data.companies.length?data.companies.map(company=>'<article class="admin-company"><div><span class="admin-status">'+escapeHtml(company.status)+'</span><h3>'+escapeHtml(company.name)+'</h3><p>'+escapeHtml(company.workspaceSlug?company.workspaceSlug+".imotech.solutions":"No workspace")+'</p></div><div><small>CONTACT</small><span>'+escapeHtml(company.email||"Not set")+'</span><small>'+escapeHtml(company.country||"Country not set")+'</small></div><div class="company-metrics"><div><strong>'+company.siteCount+'</strong><span>Sites</span></div><div><strong>'+company.employeeCount+'</strong><span>Employees</span></div><div><strong>'+company.pendingInvites+'</strong><span>Pending</span></div></div><div><small>REGISTRATION</small><span>'+escapeHtml(company.registrationNumber||"Not set")+'</span><small>'+escapeHtml(company.phone||"No phone")+'</small></div></article>').join(""):'<div class="empty-sites">No companies registered.</div>';
 };
+byId("platformCompanyFilter").addEventListener("change",renderPlatformUsers);
+byId("platformRoleFilter").addEventListener("change",renderPlatformUsers);
 const openSuperadminDashboard=async()=>{
   if(!isSuperAdmin(auth.currentUser))return;
   byId("publicHome").hidden=true;
