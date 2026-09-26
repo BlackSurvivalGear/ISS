@@ -92,8 +92,8 @@
   <main id="calendarView" hidden>
     <section class="status-panel shifts-page">
       <nav class="module-nav" aria-label="Operations navigation"><button type="button" class="module-nav-btn" data-module-nav="dashboard">Dashboard</button><button type="button" class="module-nav-btn" data-module-nav="sites">Sites</button><button type="button" class="module-nav-btn" data-module-nav="team">Team</button><button type="button" class="module-nav-btn" data-module-nav="shifts">Shifts &amp; Patrols</button><button type="button" class="module-nav-btn active" data-module-nav="calendar">Calendar</button></nav>
-      <div class="section-heading"><div><p class="eyebrow">SHIFT CALENDAR</p><h2>Weekly Operations Calendar</h2><small>Monday–Sunday duty coverage</small></div></div>
-      <div class="shift-toolbar"><div class="week-controls" id="weekControls"><button class="secondary" id="previousWeek" type="button" aria-label="Previous week">‹</button><button class="secondary" id="thisWeek" type="button">This Week</button><button class="secondary" id="nextWeek" type="button" aria-label="Next week">›</button><strong id="weekRange"></strong></div></div>
+      <div class="section-heading"><div><p class="eyebrow">SHIFT CALENDAR</p><h2>Operations Calendar</h2><small id="calendarSubtitle">Monday–Sunday duty coverage</small></div><div class="calendar-view-switch"><button class="secondary" id="calendarDayMode" type="button">Day</button><button class="secondary active" id="calendarWeekMode" type="button">Week</button><button class="secondary" id="calendarMonthMode" type="button">Month</button></div></div>
+      <div class="shift-toolbar"><div class="week-controls" id="weekControls"><button class="secondary" id="previousWeek" type="button" aria-label="Previous period">‹</button><button class="secondary" id="thisWeek" type="button">Today</button><button class="secondary" id="nextWeek" type="button" aria-label="Next period">›</button><strong id="weekRange"></strong></div></div>
       <div id="shiftCalendar" class="shift-calendar"></div>
     </section>
   </main>
