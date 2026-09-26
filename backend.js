@@ -142,8 +142,19 @@ export async function createShift(companyId,shift){
   await batch.commit();
   return {ids:refs,count:refs.length};
 }
-export async function deleteShift(companyId,shiftId){
-  await deleteDoc(doc(db,"companies",companyId,"shifts",shiftId));
+export async function deleteShift(companyId,shiftId,scope="one"){
+  const ref=doc(db,"companies",companyId,"shifts",shiftId);
+  if(scope==="one"){await deleteDoc(ref);return 1}
+  const snap=await getDoc(ref);
+  if(!snap.exists()) throw new Error("Shift not found.");
+  const current=snap.data();
+  if(!current.seriesId){await deleteDoc(ref);return 1}
+  const all=await getDocs(query(collection(db,"companies",companyId,"shifts"),where("seriesId","==",current.seriesId)));
+  const targets=all.docs.filter(item=>scope==="all"||(scope==="future"&&item.data().date>=current.date));
+  const batch=writeBatch(db);
+  targets.forEach(item=>batch.delete(item.ref));
+  await batch.commit();
+  return targets.length;
 }
 export async function updateShift(companyId,shiftId,changes){
   const ref=doc(db,"companies",companyId,"shifts",shiftId),snap=await getDoc(ref);
