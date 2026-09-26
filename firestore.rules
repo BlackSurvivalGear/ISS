@@ -43,6 +43,11 @@ service cloud.firestore {
         allow update: if companyMember(companyId) || (signedIn() && resource.data.email == request.auth.token.email && resource.data.status == "pending" && request.resource.data.status == "active" && request.resource.data.acceptedUid == request.auth.uid);
         allow delete: if companyOwner(companyId) && resource.data.status == "suspended";
       }
+      match /sites/{siteId} {
+        allow read: if superAdmin() || companyMember(companyId);
+        allow create, update: if companyMember(companyId);
+        allow delete: if companyOwner(companyId) && resource.data.status == "suspended";
+      }
       match /{document=**} {
         allow read: if superAdmin() || companyMember(companyId);
         allow create: if signedIn() && request.auth.uid == companyId;

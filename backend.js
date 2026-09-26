@@ -120,6 +120,30 @@ export async function saveSite(companyId,site){
   const ref=await addDoc(collection(db,"companies",companyId,"sites"),{...payload,createdAt:serverTimestamp()});return ref.id;
 }
 
+export async function deleteSite(companyId,id){
+  const siteRef=doc(db,"companies",companyId,"sites",id);
+  const siteSnap=await getDoc(siteRef);
+  if(!siteSnap.exists()) throw new Error("Site not found.");
+  if(siteSnap.data().status!=="suspended") throw new Error("Suspend the site before deleting.");
+
+  const invitations=await getDocs(collection(db,"companies",companyId,"invitations"));
+  const assignedInvites=invitations.docs.filter(item=>item.data().siteId===id);
+  const batch=writeBatch(db);
+
+  // Remove site-linked team membership records. Firebase Auth identities remain,
+  // but without a /users membership they cannot regain company access.
+  assignedInvites.forEach(item=>{
+    const invite=item.data();
+    batch.delete(item.ref);
+    if(invite.acceptedUid) batch.delete(doc(db,"users",invite.acceptedUid));
+  });
+
+  // Current ISS site data is stored in the site document plus team assignments.
+  // Future site subcollections must be explicitly added here before site deletion.
+  batch.delete(siteRef);
+  await batch.commit();
+}
+
 export async function listInvitations(companyId){
   const snap=await getDocs(collection(db,"companies",companyId,"invitations"));
   return snap.docs.map(item=>({id:item.id,...item.data()}));
