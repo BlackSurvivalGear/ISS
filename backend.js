@@ -90,6 +90,19 @@ export async function getPlatformOverview(){
   });
   return {
     companies,
+    users:users.map(user=>{
+      const company=companies.find(item=>item.id===user.companyId);
+      return {
+        id:user.id,
+        name:[user.firstName,user.lastName].filter(Boolean).join(" ")||user.email||"User",
+        email:user.email||"",
+        role:user.role||"Officer",
+        status:user.status||"active",
+        siteName:user.siteName||"Company-wide",
+        companyId:user.companyId||"",
+        companyName:company?.name||"Unknown company"
+      };
+    }),
     alerts,
     totals:{
       companies:companies.length,

@@ -79,6 +79,14 @@ const loadDashboard=async user=>{
   return data;
 };
 
+let platformData=null;
+const renderPlatformUsers=()=>{
+  if(!platformData)return;
+  const company=byId("platformCompanyFilter").value,role=byId("platformRoleFilter").value;
+  const users=platformData.users.filter(user=>(!company||user.companyId===company)&&(!role||user.role===role));
+  byId("platformUserCount").textContent=users.length+" user"+(users.length===1?"":"s")+" shown";
+  byId("platformUserList").innerHTML=users.length?users.map(user=>'<article class="admin-user"><span class="user-avatar">'+escapeHtml((user.name||user.email||"U").split(/\\s+/).map(part=>part[0]).join("").slice(0,2).toUpperCase())+'</span><div><strong>'+escapeHtml(user.name)+'</strong><small>'+escapeHtml(user.email)+'</small></div><div><small>COMPANY</small><span>'+escapeHtml(user.companyName)+'</span></div><div><small>ROLE</small><span>'+escapeHtml(user.role)+'</span></div><div><small>SITE</small><span>'+escapeHtml(user.siteName)+'</span></div><span class="admin-status">'+escapeHtml(user.status)+'</span></article>').join(""):'<div class="empty-sites">No users match these filters.</div>';
+};
 const renderPlatform=async()=>{
   const data=await getPlatformOverview();
   byId("platformCompanies").textContent=String(data.totals.companies);
