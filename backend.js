@@ -42,7 +42,7 @@ export async function getDashboardData(uid){
   if(!companySnap.exists()) return null;
   const company=companySnap.data();
   const user=userSnap.data();
-  return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount:sitesSnap.size,teamCount:invitesSnap.size,role:user.role||"Officer",siteId:user.siteId||"company-wide",siteName:user.siteName||"Company-wide"};
+  return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount:sitesSnap.size,teamCount:invitesSnap.size,role:user.role||"Officer",siteId:user.siteId||"company-wide",siteName:user.siteName||"Company-wide",firstName:user.firstName||"",lastName:user.lastName||"",email:user.email||""};
 }
 
 export async function getPlatformOverview(){
