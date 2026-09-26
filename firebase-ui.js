@@ -1,4 +1,4 @@
-import { registerCompany, getDashboardData, listSites, saveSite, deleteSite, listInvitations, saveInvitation, setInvitationStatus, deleteTeamMember, acceptInvitation, getPlatformOverview } from "./backend.js";
+import { registerCompany, getDashboardData, listSites, saveSite, deleteSite, listInvitations, saveInvitation, setInvitationStatus, deleteTeamMember, acceptInvitation, getPlatformOverview, updateUserProfile } from "./backend.js";
 import { auth, signIn, signOutUser, observeAuth, isSuperAdmin } from "./auth-service.js";
 
 const byId=id=>document.getElementById(id);
@@ -14,8 +14,25 @@ const setHeaderUser=(user,data={})=>{
   byId("userAvatar").textContent=initials||"U";
   byId("userName").textContent=displayName;
   byId("userEmail").textContent=email;
+  byId("profileName").textContent=displayName;
+  byId("profileEmail").textContent=email;
+  byId("profileRole").textContent=data.role|| (isSuperAdmin(user)?"Platform Admin":"");
+  byId("profileCompany").textContent=data.companyName|| (isSuperAdmin(user)?"ImoTech Security Solutions":"");
+  account.dataset.firstName=data.firstName||"";
+  account.dataset.lastName=data.lastName||"";
   account.hidden=false;
 };
+
+const profileMenu=byId("profileMenu"),userTrigger=byId("userTrigger"),profileEditor=byId("profileEditor"),profileForm=byId("profileForm");
+const setProfileMenu=open=>{profileMenu.hidden=!open;userTrigger.setAttribute("aria-expanded",String(open))};
+userTrigger.addEventListener("click",e=>{e.stopPropagation();setProfileMenu(profileMenu.hidden)});
+byId("userAccount").addEventListener("mouseenter",()=>{if(matchMedia("(hover:hover)").matches)setProfileMenu(true)});
+byId("userAccount").addEventListener("mouseleave",()=>{if(matchMedia("(hover:hover)").matches)setProfileMenu(false)});
+document.addEventListener("click",e=>{if(!byId("userAccount").contains(e.target))setProfileMenu(false)});
+byId("profileSignOut").addEventListener("click",async()=>{setProfileMenu(false);await signOutUser();localStorage.removeItem("iss-company-id");localStorage.removeItem("iss-workspace-slug");openPublicHome()});
+byId("editProfile").addEventListener("click",()=>{setProfileMenu(false);profileForm.elements.firstName.value=byId("userAccount").dataset.firstName||"";profileForm.elements.lastName.value=byId("userAccount").dataset.lastName||"";profileForm.elements.email.value=auth.currentUser?.email||"";profileEditor.hidden=false});
+byId("closeProfileEditor").addEventListener("click",()=>profileEditor.hidden=true);
+profileForm.addEventListener("submit",async e=>{e.preventDefault();const status=byId("profileMessage"),button=profileForm.querySelector('button[type="submit"]');button.disabled=true;message(status,"Saving…");try{const data=formData(profileForm);await updateUserProfile(auth.currentUser.uid,data);const dashboard=await getDashboardData(auth.currentUser.uid);currentDashboard=dashboard;setHeaderUser(auth.currentUser,dashboard);profileEditor.hidden=true;message(status,"")}catch(error){console.error(error);message(status,"Could not update profile.",true)}finally{button.disabled=false}});
 
 const ROLE_ACCESS={
   "Company Owner":{sites:true,team:true},
@@ -164,12 +181,7 @@ signinForm.addEventListener("submit",async event=>{
   }finally{button.disabled=false}
 });
 
-byId("dashboardSignOut").addEventListener("click",async()=>{
-  await signOutUser();
-  localStorage.removeItem("iss-company-id");
-  localStorage.removeItem("iss-workspace-slug");
-  openPublicHome();
-});
+byId("dashboardSignOut").hidden=true;
 
 let currentDashboard=null;
 
