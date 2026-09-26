@@ -126,7 +126,7 @@ export async function createShift(companyId,shift){
   const cursor=new Date(start);
   while(cursor<=end&&dates.length<366){
     const day=cursor.getDay(),iso=cursor.toISOString().slice(0,10);
-    if(recurrence==="none"||recurrence==="daily"||(recurrence==="weekly"&&((cursor-start)/86400000)%7===0)||(recurrence==="weekdays"&&day>=1&&day<=5)||(recurrence==="weekends"&&(day===0||day===6))) dates.push(iso);
+    if(recurrence==="none"||recurrence==="daily"||(recurrence==="weekly"&&((cursor-start)/86400000)%7===0)||(recurrence==="weekdays"&&day>=1&&day<=5)||(recurrence==="weekends"&&(day===5||day===6))) dates.push(iso);
     if(recurrence==="none") break;
     cursor.setDate(cursor.getDate()+1);
   }
