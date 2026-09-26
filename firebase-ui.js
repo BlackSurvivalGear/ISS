@@ -1,9 +1,9 @@
-import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData, listSites, saveSite, listInvitations, saveInvitation, setInvitationStatus, acceptInvitation, getPlatformOverview } from "./backend.js";\nimport { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-functions.js";
+import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData, listSites, saveSite, listInvitations, saveInvitation, setInvitationStatus, acceptInvitation, getPlatformOverview } from "./backend.js";
 
 const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
-const SUPERADMIN_EMAIL="admin@lawal.org";\nconst cloudFunctions=getFunctions(undefined,"europe-west2");\nconst purgeAllTestData=httpsCallable(cloudFunctions,"purgeAllTestData");
+const SUPERADMIN_EMAIL="admin@lawal.org";
 const isSuperAdmin=user=>String(user?.email||"").toLowerCase()===SUPERADMIN_EMAIL;
 const setHeaderUser=(user,data={})=>{
   const account=byId("userAccount");
@@ -114,7 +114,7 @@ const openSuperadminDashboard=async()=>{
   await renderPlatform();
 };
 byId("superadminLaunch").addEventListener("click",openSuperadminDashboard);
-byId("superadminSignOut").addEventListener("click",async()=>{await signOutUser();setHeaderUser(null);byId("superadminLaunch").hidden=true;openPublicHome()});\nconst purgeModal=byId("purgeAllModal"),purgeInput=byId("purgeAllConfirmation"),purgeConfirm=byId("purgeAllConfirm");\nbyId("purgeAllOpen").addEventListener("click",()=>{if(!isSuperAdmin(auth.currentUser))return;purgeInput.value="";purgeConfirm.disabled=true;byId("purgeAllMessage").textContent="";purgeModal.hidden=false});\nbyId("purgeAllClose").addEventListener("click",()=>purgeModal.hidden=true);\npurgeInput.addEventListener("input",()=>{purgeConfirm.disabled=purgeInput.value!=="PURGE ALL"});\npurgeConfirm.addEventListener("click",async()=>{if(!isSuperAdmin(auth.currentUser)||purgeInput.value!=="PURGE ALL")return;purgeConfirm.disabled=true;message(byId("purgeAllMessage"),"Purging test data…");try{const result=await purgeAllTestData({confirmation:"PURGE ALL"});purgeModal.hidden=true;message(byId("purgeAllStatus"),"Purge complete · "+result.data.authUsersDeleted+" accounts · "+result.data.companiesDeleted+" companies.");await renderPlatform()}catch(error){console.error(error);message(byId("purgeAllMessage"),error?.message||"Purge failed.",true);purgeConfirm.disabled=false}});
+byId("superadminSignOut").addEventListener("click",async()=>{await signOutUser();setHeaderUser(null);byId("superadminLaunch").hidden=true;openPublicHome()});
 
 const launch=byId("launchWorkspace");
 launch.addEventListener("click",async event=>{
