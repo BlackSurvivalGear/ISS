@@ -177,7 +177,7 @@ const openShiftsView=async()=>{
   const sites=await listSites(currentDashboard.companyId);byId("shiftSite").innerHTML=sites.map(s=>'<option value="'+escapeHtml(s.id)+'">'+escapeHtml(s.name)+'</option>').join("");
   shiftData=await listShifts(currentDashboard.companyId);renderShifts();
 };
-byId("openShifts").addEventListener("click",openShiftsView);byId("backShiftDashboard").addEventListener("click",()=>{byId("shiftsView").hidden=true;byId("companyDashboard").hidden=false});
+byId("openShifts").addEventListener("click",async()=>{await openShiftsView();setShiftView("list")});byId("openCalendar").addEventListener("click",async()=>{await openShiftsView();setShiftView("calendar")});byId("backShiftDashboard").addEventListener("click",()=>{byId("shiftsView").hidden=true;byId("companyDashboard").hidden=false});
 byId("addShift").addEventListener("click",()=>{byId("shiftEditorMessage").textContent="";byId("shiftRecurrence").value="none";byId("shiftRepeatUntilWrap").hidden=true;byId("shiftEditor").hidden=false});
 byId("shiftRecurrence").addEventListener("change",e=>{const repeating=e.target.value!=="none";byId("shiftRepeatUntilWrap").hidden=!repeating;byId("shiftRepeatUntil").required=repeating});
 byId("closeShiftManage").addEventListener("click",()=>byId("shiftManage").hidden=true);byId("closeShiftEditor").addEventListener("click",()=>byId("shiftEditor").hidden=true);
