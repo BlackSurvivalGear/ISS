@@ -81,7 +81,7 @@
     <section class="status-panel shifts-page">
       <div class="section-heading"><div><p class="eyebrow">SHIFT MANAGEMENT</p><h2>Duty Rota</h2><small id="shiftAccessLabel">Schedule and manage site coverage</small></div><div class="actions"><button class="secondary" id="backShiftDashboard" type="button">Back to Dashboard</button><button class="primary" id="addShift" type="button">Create Shift</button></div></div>
       <div class="shift-stats"><article><span>Upcoming</span><strong id="shiftUpcoming">0</strong></article><article><span>Open positions</span><strong id="shiftOpen">0</strong></article><article><span>My shifts</span><strong id="shiftMine">0</strong></article></div>
-      <div class="shift-toolbar"><button class="secondary active" id="shiftListMode" type="button">List</button><button class="secondary" id="shiftCalendarMode" type="button">Calendar</button><input type="month" id="shiftMonth"></div>
+      <div class="shift-toolbar"><button class="secondary active" id="shiftListMode" type="button">List</button><button class="secondary" id="shiftCalendarMode" type="button">Weekly Calendar</button><input type="month" id="shiftMonth"><div class="week-controls" id="weekControls" hidden><button class="secondary" id="previousWeek" type="button" aria-label="Previous week">‹</button><button class="secondary" id="thisWeek" type="button">This Week</button><button class="secondary" id="nextWeek" type="button" aria-label="Next week">›</button><strong id="weekRange"></strong></div></div>
       <div id="shiftList" class="shift-list"></div><div id="shiftCalendar" class="shift-calendar" hidden></div>
     </section>
   </main>
