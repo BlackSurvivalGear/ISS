@@ -120,6 +120,16 @@ export async function saveSite(companyId,site){
   const ref=await addDoc(collection(db,"companies",companyId,"sites"),{...payload,createdAt:serverTimestamp()});return ref.id;
 }
 
+export async function deleteSite(companyId,id){
+  const siteRef=doc(db,"companies",companyId,"sites",id);
+  const siteSnap=await getDoc(siteRef);
+  if(!siteSnap.exists()) throw new Error("Site not found.");
+  if(siteSnap.data().status!=="suspended") throw new Error("Suspend the site before deleting.");
+  const invitations=await getDocs(collection(db,"companies",companyId,"invitations"));
+  if(invitations.docs.some(item=>item.data().siteId===id)) throw new Error("Reassign or delete team members assigned to this site first.");
+  await deleteDoc(siteRef);
+}
+
 export async function listInvitations(companyId){
   const snap=await getDocs(collection(db,"companies",companyId,"invitations"));
   return snap.docs.map(item=>({id:item.id,...item.data()}));
