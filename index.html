@@ -84,7 +84,7 @@
       <nav class="module-nav" aria-label="Operations navigation"><button type="button" class="module-nav-btn" data-module-nav="dashboard">Dashboard</button><button type="button" class="module-nav-btn" data-module-nav="sites">Sites</button><button type="button" class="module-nav-btn" data-module-nav="team">Team</button><button type="button" class="module-nav-btn active" data-module-nav="shifts">Shifts &amp; Patrols</button><button type="button" class="module-nav-btn" data-module-nav="calendar">Calendar</button></nav>
       <div class="section-heading"><div><p class="eyebrow">SHIFT MANAGEMENT</p><h2>Duty Rota</h2><small id="shiftAccessLabel">Schedule and manage site coverage</small></div><div class="actions"><button class="primary" id="addShift" type="button">Create Shift</button></div></div>
       <div class="shift-stats"><article><span>Upcoming</span><strong id="shiftUpcoming">0</strong></article><article><span>Open positions</span><strong id="shiftOpen">0</strong></article><article><span>My shifts</span><strong id="shiftMine">0</strong></article></div>
-      <div class="shift-toolbar"><input type="month" id="shiftMonth"></div>
+      <div class="shift-toolbar rota-month-toolbar"><button class="secondary rota-month-arrow" id="previousShiftMonth" type="button" aria-label="Previous month">‹</button><strong id="shiftMonthLabel" class="rota-month-label"></strong><button class="secondary rota-month-arrow" id="nextShiftMonth" type="button" aria-label="Next month">›</button><input type="hidden" id="shiftMonth"></div>
       <div id="shiftList" class="shift-list"></div>
     </section>
   </main>
