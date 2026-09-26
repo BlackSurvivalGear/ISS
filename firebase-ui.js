@@ -96,8 +96,8 @@ const loadDashboard=async user=>{
 let platformData=null;
 const renderPlatformUsers=()=>{
   if(!platformData)return;
-  const company=byId("platformCompanyFilter").value,role=byId("platformRoleFilter").value;
-  const users=platformData.users.filter(user=>(!company||user.companyId===company)&&(!role||user.role===role));
+  const company=byId("platformCompanyFilter").value,role=byId("platformRoleFilter").value,status=byId("platformStatusFilter").value,name=byId("platformNameFilter").value.trim().toLowerCase();
+  const users=platformData.users.filter(user=>(!company||user.companyId===company)&&(!role||user.role===role)&&(!status||user.status===status)&&(!name||String(user.name||"").toLowerCase().includes(name)));
   byId("platformUserCount").textContent=users.length+" user"+(users.length===1?"":"s")+" shown";
   byId("platformUserList").innerHTML=users.length?users.map(user=>'<article class="admin-user"><span class="user-avatar">'+escapeHtml((user.name||user.email||"U").split(/\\s+/).map(part=>part[0]).join("").slice(0,2).toUpperCase())+'</span><div><strong>'+escapeHtml(user.name)+'</strong><small>'+escapeHtml(user.email)+'</small></div><div><small>COMPANY</small><span>'+escapeHtml(user.companyName)+'</span></div><div><small>ROLE</small><span>'+escapeHtml(user.role)+'</span></div><div><small>SITE</small><span>'+escapeHtml(user.siteName)+'</span></div><span class="admin-status">'+escapeHtml(user.status)+'</span></article>').join(""):'<div class="empty-sites">No users match these filters.</div>';
 };
@@ -111,23 +111,30 @@ const renderPlatform=async()=>{
   companyFilter.innerHTML='<option value="">All companies</option>'+data.companies.map(company=>'<option value="'+escapeHtml(company.id)+'">'+escapeHtml(company.name)+'</option>').join("");
   const roles=[...new Set(data.users.map(user=>user.role))].sort();
   roleFilter.innerHTML='<option value="">All roles</option>'+roles.map(role=>'<option value="'+escapeHtml(role)+'">'+escapeHtml(role)+'</option>').join("");
+  const statuses=[...new Set(data.users.map(user=>user.status).filter(Boolean))].sort();
+  byId("platformStatusFilter").innerHTML='<option value="">All statuses</option>'+statuses.map(status=>'<option value="'+escapeHtml(status)+'">'+escapeHtml(status)+'</option>').join("");
   renderPlatformUsers();
   byId("platformAlertList").innerHTML=data.alerts.length?data.alerts.map(alert=>'<article class="admin-alert"><strong>'+escapeHtml(alert.type)+'</strong><span>'+escapeHtml(alert.company)+'</span><small>'+escapeHtml(alert.detail)+'</small></article>').join(""):'<div class="empty-sites">No platform alerts.</div>';
   byId("platformCompanyList").innerHTML=data.companies.length?data.companies.map(company=>'<article class="admin-company"><div><span class="admin-status">'+escapeHtml(company.status)+'</span><h3>'+escapeHtml(company.name)+'</h3><p>'+escapeHtml(company.workspaceSlug?company.workspaceSlug+".imotech.solutions":"No workspace")+'</p></div><div><small>CONTACT</small><span>'+escapeHtml(company.email||"Not set")+'</span><small>'+escapeHtml(company.country||"Country not set")+'</small></div><div class="company-metrics"><div><strong>'+company.siteCount+'</strong><span>Sites</span></div><div><strong>'+company.employeeCount+'</strong><span>Employees</span></div><div><strong>'+company.pendingInvites+'</strong><span>Pending</span></div></div><div><small>REGISTRATION</small><span>'+escapeHtml(company.registrationNumber||"Not set")+'</span><small>'+escapeHtml(company.phone||"No phone")+'</small></div></article>').join(""):'<div class="empty-sites">No companies registered.</div>';
 };
 byId("platformCompanyFilter").addEventListener("change",renderPlatformUsers);
 byId("platformRoleFilter").addEventListener("change",renderPlatformUsers);
+byId("platformStatusFilter").addEventListener("change",renderPlatformUsers);
+byId("platformNameFilter").addEventListener("input",renderPlatformUsers);
 const openSuperadminDashboard=async()=>{
   if(!isSuperAdmin(auth.currentUser))return;
   byId("publicHome").hidden=true;
   byId("companyDashboard").hidden=true;
   byId("teamView").hidden=true;
   byId("sitesView").hidden=true;
+  byId("platformUsersView").hidden=true;
   byId("superadminDashboard").hidden=false;
   window.scrollTo({top:0});
   await renderPlatform();
 };
 byId("superadminLaunch").addEventListener("click",openSuperadminDashboard);
+byId("openPlatformUsers").addEventListener("click",async()=>{if(!isSuperAdmin(auth.currentUser))return;byId("superadminDashboard").hidden=true;byId("platformUsersView").hidden=false;window.scrollTo({top:0});if(!platformData)await renderPlatform();renderPlatformUsers()});
+byId("backPlatformDashboard").addEventListener("click",()=>{byId("platformUsersView").hidden=true;byId("superadminDashboard").hidden=false;window.scrollTo({top:0})});
 byId("superadminSignOut").addEventListener("click",async()=>{await signOutUser();setHeaderUser(null);byId("superadminLaunch").hidden=true;openPublicHome()});
 
 const launch=byId("launchWorkspace");
