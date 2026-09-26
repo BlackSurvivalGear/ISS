@@ -1,4 +1,4 @@
-import { registerCompany, getDashboardData, listSites, saveSite, deleteSite, listInvitations, saveInvitation, setInvitationStatus, deleteTeamMember, acceptInvitation, getPlatformOverview, updateUserProfile } from "./backend.js";
+import { registerCompany, getDashboardData, listSites, saveSite, deleteSite, listInvitations, saveInvitation, setInvitationStatus, deleteTeamMember, acceptInvitation, getPlatformOverview, updateUserProfile, listShifts, createShift, claimShift } from "./backend.js";
 import { auth, signIn, signOutUser, observeAuth, isSuperAdmin } from "./auth-service.js";
 
 const byId=id=>document.getElementById(id);
@@ -93,6 +93,31 @@ const loadDashboard=async user=>{
   return data;
 };
 
+let shiftData=[];
+const shiftManagers=new Set(["Company Owner","Operations Manager","Controller","Supervisor"]);
+const renderShifts=()=>{
+  const uid=auth.currentUser?.uid,month=byId("shiftMonth").value;
+  const visible=shiftData.filter(s=>!month||String(s.date||"").startsWith(month)).sort((a,b)=>String(a.date+a.startTime).localeCompare(String(b.date+b.startTime)));
+  byId("shiftUpcoming").textContent=visible.length;
+  byId("shiftOpen").textContent=visible.reduce((n,s)=>n+Math.max(0,Number(s.positions||1)-(s.assignments||[]).length),0);
+  byId("shiftMine").textContent=visible.filter(s=>(s.assignments||[]).some(a=>a.uid===uid)).length;
+  byId("shiftList").innerHTML=visible.length?visible.map(s=>{const mine=(s.assignments||[]).some(a=>a.uid===uid),open=Math.max(0,Number(s.positions||1)-(s.assignments||[]).length);return '<article class="shift-card"><div><small>'+escapeHtml(s.date||"")+'</small><h3>'+escapeHtml(s.siteName||"Site")+'</h3><span>'+escapeHtml(s.startTime||"")+'–'+escapeHtml(s.endTime||"")+' · '+escapeHtml(s.requiredRole||"Officer")+'</span></div><div><strong>'+open+'</strong><small>OPEN</small></div><div class="shift-assignees">'+(s.assignments||[]).map(a=>'<span>'+escapeHtml(a.name)+'</span>').join("")+'</div>'+(mine?'<span class="admin-status">BOOKED</span>':open>0?'<button class="secondary claim-shift" data-shift="'+s.id+'">Book Shift</button>':'<span class="admin-status">FULL</span>')+'</article>'}).join(""):'<div class="empty-sites">No shifts scheduled for this month.</div>';
+  const days={};visible.forEach(s=>(days[s.date]??=[]).push(s));byId("shiftCalendar").innerHTML=Object.keys(days).sort().map(date=>'<article><strong>'+escapeHtml(date)+'</strong>'+days[date].map(s=>'<span>'+escapeHtml(s.startTime)+' '+escapeHtml(s.siteName)+'</span>').join("")+'</article>').join("");
+  document.querySelectorAll(".claim-shift").forEach(btn=>btn.onclick=async()=>{try{await claimShift(currentDashboard.companyId,btn.dataset.shift,{uid,email:currentDashboard.email,name:[currentDashboard.firstName,currentDashboard.lastName].filter(Boolean).join(" ")});shiftData=await listShifts(currentDashboard.companyId);renderShifts()}catch(e){alert(e.message)}});
+};
+const openShiftsView=async()=>{
+  if(!currentDashboard)return;
+  byId("companyDashboard").hidden=true;byId("shiftsView").hidden=false;window.scrollTo({top:0});
+  const canManage=shiftManagers.has(currentDashboard.role);byId("addShift").hidden=!canManage;byId("shiftAccessLabel").textContent=canManage?"Schedule coverage and fill vacancies":"View your rota and book available shifts";
+  const sites=await listSites(currentDashboard.companyId);byId("shiftSite").innerHTML=sites.map(s=>'<option value="'+escapeHtml(s.id)+'">'+escapeHtml(s.name)+'</option>').join("");
+  shiftData=await listShifts(currentDashboard.companyId);renderShifts();
+};
+byId("openShifts").addEventListener("click",openShiftsView);byId("backShiftDashboard").addEventListener("click",()=>{byId("shiftsView").hidden=true;byId("companyDashboard").hidden=false});
+byId("addShift").addEventListener("click",()=>byId("shiftEditor").hidden=false);byId("closeShiftEditor").addEventListener("click",()=>byId("shiftEditor").hidden=true);
+byId("shiftMonth").value=new Date().toISOString().slice(0,7);byId("shiftMonth").addEventListener("change",renderShifts);
+byId("shiftListMode").addEventListener("click",()=>{byId("shiftList").hidden=false;byId("shiftCalendar").hidden=true});byId("shiftCalendarMode").addEventListener("click",()=>{byId("shiftList").hidden=true;byId("shiftCalendar").hidden=false});
+byId("shiftEditorForm").addEventListener("submit",async e=>{e.preventDefault();const d=formData(e.currentTarget),site=byId("shiftSite").selectedOptions[0];try{await createShift(currentDashboard.companyId,{...d,siteName:site?.textContent||""});e.currentTarget.reset();byId("shiftEditor").hidden=true;shiftData=await listShifts(currentDashboard.companyId);renderShifts()}catch(err){message(byId("shiftEditorMessage"),err.message,true)}});
+
 let platformData=null;
 const renderPlatformUsers=()=>{
   if(!platformData)return;
@@ -128,6 +153,7 @@ const openSuperadminDashboard=async()=>{
   byId("companyDashboard").hidden=true;
   byId("teamView").hidden=true;
   byId("sitesView").hidden=true;
+  byId("shiftsView").hidden=true;
   byId("platformUsersView").hidden=true;
   byId("superadminDashboard").hidden=false;
   window.scrollTo({top:0});

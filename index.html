@@ -72,11 +72,20 @@
     <section class="modules"><p class="eyebrow">OPERATIONS</p><h2>Company control centre</h2><div class="module-grid">
       <article class="module-action" id="openSites" tabindex="0"><b>01</b><h3>Sites</h3><p>Manage security locations and site requirements.</p></article>
       <article class="module-action" id="openTeam" tabindex="0"><b>02</b><h3>Team</h3><p>Manage officers, supervisors and company access.</p></article>
-      <article><b>03</b><h3>Shifts & Patrols</h3><p>Configure duty periods, patrols and checkpoints.</p></article>
+      <article class="module-link" id="openShifts"><b>03</b><h3>Shifts & Patrols</h3><p>Schedule duty periods, fill vacancies and manage patrols.</p></article>
       <article><b>04</b><h3>Reports</h3><p>Incidents, occurrence book and client evidence.</p></article>
     </div></section>
   </main>
 
+  <main id="shiftsView" hidden>
+    <section class="status-panel shifts-page">
+      <div class="section-heading"><div><p class="eyebrow">SHIFT MANAGEMENT</p><h2>Duty Rota</h2><small id="shiftAccessLabel">Schedule and manage site coverage</small></div><div class="actions"><button class="secondary" id="backShiftDashboard" type="button">Back to Dashboard</button><button class="primary" id="addShift" type="button">Create Shift</button></div></div>
+      <div class="shift-stats"><article><span>Upcoming</span><strong id="shiftUpcoming">0</strong></article><article><span>Open positions</span><strong id="shiftOpen">0</strong></article><article><span>My shifts</span><strong id="shiftMine">0</strong></article></div>
+      <div class="shift-toolbar"><button class="secondary active" id="shiftListMode" type="button">List</button><button class="secondary" id="shiftCalendarMode" type="button">Calendar</button><input type="month" id="shiftMonth"></div>
+      <div id="shiftList" class="shift-list"></div><div id="shiftCalendar" class="shift-calendar" hidden></div>
+    </section>
+  </main>
+  <div class="modal" id="shiftEditor" hidden><div class="modal-card onboarding-card"><button class="close" id="closeShiftEditor" aria-label="Close">×</button><p class="eyebrow">SHIFT DETAILS</p><h2>Create Shift</h2><form class="account-form" id="shiftEditorForm"><label>Site<select name="siteId" id="shiftSite" required></select></label><div class="field-row"><label>Date<input type="date" name="date" required></label><label>Positions<input type="number" name="positions" min="1" max="50" value="1" required></label></div><div class="field-row"><label>Start<input type="time" name="startTime" required></label><label>End<input type="time" name="endTime" required></label></div><label>Required role<select name="requiredRole"><option>Officer</option><option>Team Leader</option><option>Supervisor</option></select></label><label>Notes<textarea name="notes" rows="3"></textarea></label><button class="primary form-submit" type="submit">Create Shift</button><p class="coming" id="shiftEditorMessage"></p></form></div></div>
   <main id="superadminDashboard" hidden>
     <section class="status-panel company-dashboard">
       <div class="section-heading"><div><p class="eyebrow">ISS PLATFORM ADMINISTRATION</p><h2>Superadmin Dashboard</h2><small>Platform-wide company oversight</small></div><div class="actions"><button class="secondary" type="button" id="openPlatformUsers">Users</button><span class="live"><i></i> SUPERADMIN</span></div></div>
