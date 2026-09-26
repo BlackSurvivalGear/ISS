@@ -1,8 +1,8 @@
-import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData, listSites, saveSite, listInvitations, saveInvitation, setInvitationStatus, acceptInvitation } from "./backend.js";
+import { auth, registerCompany, signIn, signOutUser, observeAuth, getDashboardData, listSites, saveSite, listInvitations, saveInvitation, setInvitationStatus, acceptInvitation, getPlatformOverview } from "./backend.js";
 
 const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
-const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
+const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};\nconst SUPERADMIN_EMAIL="admin@lawal.org";\nconst isSuperAdmin=user=>String(user?.email||"").toLowerCase()===SUPERADMIN_EMAIL;
 
 const ROLE_ACCESS={
   "Company Owner":{sites:true,team:true},
@@ -46,6 +46,12 @@ const openPublicHome=()=>{
 
 const loadDashboard=async user=>{
   if(!user) return null;
+  if(isSuperAdmin(user)){
+    byId("superadminLaunch").hidden=false;
+    openPublicHome();
+    return {superadmin:true};
+  }
+  byId("superadminLaunch").hidden=true;
   const data=await getDashboardData(user.uid);
   if(!data) return null;
   localStorage.setItem("iss-company-id",data.companyId);
@@ -54,6 +60,28 @@ const loadDashboard=async user=>{
   currentDashboard=data;
   return data;
 };
+
+const renderPlatform=async()=>{
+  const data=await getPlatformOverview();
+  byId("platformCompanies").textContent=String(data.totals.companies);
+  byId("platformSites").textContent=String(data.totals.sites);
+  byId("platformEmployees").textContent=String(data.totals.employees);
+  byId("platformAlerts").textContent=String(data.totals.alerts);
+  byId("platformAlertList").innerHTML=data.alerts.length?data.alerts.map(alert=>'<article class="admin-alert"><strong>'+escapeHtml(alert.type)+'</strong><span>'+escapeHtml(alert.company)+'</span><small>'+escapeHtml(alert.detail)+'</small></article>').join(""):'<div class="empty-sites">No platform alerts.</div>';
+  byId("platformCompanyList").innerHTML=data.companies.length?data.companies.map(company=>'<article class="admin-company"><div><span class="admin-status">'+escapeHtml(company.status)+'</span><h3>'+escapeHtml(company.name)+'</h3><p>'+escapeHtml(company.workspaceSlug?company.workspaceSlug+".imotech.solutions":"No workspace")+'</p></div><div><small>CONTACT</small><span>'+escapeHtml(company.email||"Not set")+'</span><small>'+escapeHtml(company.country||"Country not set")+'</small></div><div class="company-metrics"><div><strong>'+company.siteCount+'</strong><span>Sites</span></div><div><strong>'+company.employeeCount+'</strong><span>Employees</span></div><div><strong>'+company.pendingInvites+'</strong><span>Pending</span></div></div><div><small>REGISTRATION</small><span>'+escapeHtml(company.registrationNumber||"Not set")+'</span><small>'+escapeHtml(company.phone||"No phone")+'</small></div></article>').join(""):'<div class="empty-sites">No companies registered.</div>';
+};
+const openSuperadminDashboard=async()=>{
+  if(!isSuperAdmin(auth.currentUser))return;
+  byId("publicHome").hidden=true;
+  byId("companyDashboard").hidden=true;
+  byId("teamView").hidden=true;
+  byId("sitesView").hidden=true;
+  byId("superadminDashboard").hidden=false;
+  window.scrollTo({top:0});
+  await renderPlatform();
+};
+byId("superadminLaunch").addEventListener("click",openSuperadminDashboard);
+byId("superadminSignOut").addEventListener("click",async()=>{await signOutUser();byId("superadminLaunch").hidden=true;openPublicHome()});
 
 const launch=byId("launchWorkspace");
 launch.addEventListener("click",async event=>{
