@@ -10,10 +10,8 @@ const setHeaderUser=(user,data={})=>{
   const email=data.email||user.email||"";
   const fullName=[data.firstName,data.lastName].filter(Boolean).join(" ").trim();
   const displayName=fullName||user.displayName||email.split("@")[0]||"User";
-  const initials=(fullName?fullName.split(/\s+/).map(part=>part[0]).join(""):displayName.slice(0,2)).slice(0,2).toUpperCase();
-  byId("userAvatar").textContent=initials||"U";
   byId("userName").textContent=displayName;
-  byId("userEmail").textContent=email;
+  byId("userRole").textContent=data.role|| (isSuperAdmin(user)?"Platform Admin":"");
   byId("profileName").textContent=displayName;
   byId("profileEmail").textContent=email;
   byId("profileRole").textContent=data.role|| (isSuperAdmin(user)?"Platform Admin":"");
