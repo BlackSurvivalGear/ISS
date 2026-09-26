@@ -94,6 +94,7 @@ const loadDashboard=async user=>{
   openCompanyDashboard(data);
   currentDashboard=data;
   setHeaderUser(user,data);
+  try{const shifts=await listShifts(data.companyId),start=mondayFor(new Date()),end=new Date(start);end.setDate(end.getDate()+6);const startIso=localIso(start),endIso=localIso(end);byId("dashboardWeekShifts").textContent=String(shifts.filter(shift=>shift.date>=startIso&&shift.date<=endIso).length)}catch{byId("dashboardWeekShifts").textContent="—"}
   return data;
 };
 
