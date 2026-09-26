@@ -119,7 +119,22 @@ export async function listShifts(companyId){
   return snap.docs.map(item=>({id:item.id,...item.data()}));
 }
 export async function createShift(companyId,shift){
-  return (await addDoc(collection(db,"companies",companyId,"shifts"),{siteId:shift.siteId,siteName:shift.siteName||"",date:shift.date,startTime:shift.startTime,endTime:shift.endTime,positions:Number(shift.positions)||1,requiredRole:shift.requiredRole||"Officer",notes:shift.notes||"",assignments:[],status:"open",createdBy:auth.currentUser.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()})).id;
+  const recurrence=shift.recurrence||"none",dates=[];
+  const start=new Date(shift.date+"T12:00:00"),end=shift.repeatUntil?new Date(shift.repeatUntil+"T12:00:00"):start;
+  if(recurrence!=="none"&&!shift.repeatUntil) throw new Error("Choose when the recurring shifts should end.");
+  if(end<start) throw new Error("Repeat until must be on or after the first shift date.");
+  const cursor=new Date(start);
+  while(cursor<=end&&dates.length<366){
+    const day=cursor.getDay(),iso=cursor.toISOString().slice(0,10);
+    if(recurrence==="none"||recurrence==="daily"||(recurrence==="weekly"&&((cursor-start)/86400000)%7===0)||(recurrence==="weekdays"&&day>=1&&day<=5)||(recurrence==="weekends"&&(day===5||day===6))) dates.push(iso);
+    if(recurrence==="none") break;
+    cursor.setDate(cursor.getDate()+1);
+  }
+  if(!dates.length) throw new Error("No shifts fall within that recurrence.");
+  const seriesId=recurrence==="none"?null:(auth.currentUser.uid+"-"+Date.now());
+  const refs=[];
+  for(const date of dates){const ref=await addDoc(collection(db,"companies",companyId,"shifts"),{siteId:shift.siteId,siteName:shift.siteName||"",date,startTime:shift.startTime,endTime:shift.endTime,positions:Number(shift.positions)||1,requiredRole:shift.requiredRole||"Officer",notes:shift.notes||"",assignments:[],status:"open",recurrence,seriesId,createdBy:auth.currentUser.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});refs.push(ref.id)}
+  return {ids:refs,count:refs.length};
 }
 export async function deleteShift(companyId,shiftId){
   await deleteDoc(doc(db,"companies",companyId,"shifts",shiftId));
