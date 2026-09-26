@@ -114,6 +114,25 @@ export async function getPlatformOverview(){
   };
 }
 
+export async function listShifts(companyId){
+  const snap=await getDocs(collection(db,"companies",companyId,"shifts"));
+  return snap.docs.map(item=>({id:item.id,...item.data()}));
+}
+export async function createShift(companyId,shift){
+  return (await addDoc(collection(db,"companies",companyId,"shifts"),{siteId:shift.siteId,siteName:shift.siteName||"",date:shift.date,startTime:shift.startTime,endTime:shift.endTime,positions:Number(shift.positions)||1,requiredRole:shift.requiredRole||"Officer",notes:shift.notes||"",assignments:[],status:"open",createdBy:auth.currentUser.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()})).id;
+}
+export async function claimShift(companyId,shiftId,user){
+  const ref=doc(db,"companies",companyId,"shifts",shiftId),snap=await getDoc(ref);
+  if(!snap.exists())throw new Error("Shift not found.");
+  const shift=snap.data(),assignments=Array.isArray(shift.assignments)?shift.assignments:[];
+  if(assignments.some(item=>item.uid===user.uid))throw new Error("You are already booked on this shift.");
+  if(assignments.length>=Number(shift.positions||1))throw new Error("This shift is already full.");
+  const all=await listShifts(companyId);
+  const clash=all.some(item=>item.id!==shiftId&&(item.assignments||[]).some(a=>a.uid===user.uid)&&item.date===shift.date&&item.startTime<shift.endTime&&item.endTime>shift.startTime);
+  if(clash)throw new Error("This shift overlaps another shift you are booked on.");
+  assignments.push({uid:user.uid,name:user.name||user.email||"Officer",email:user.email||"",bookedAt:new Date().toISOString()});
+  await updateDoc(ref,{assignments,status:assignments.length>=Number(shift.positions||1)?"filled":"open",updatedAt:serverTimestamp()});
+}
 export async function listSites(companyId){
   const snap=await getDocs(collection(db,"companies",companyId,"sites"));
   return snap.docs.map(item=>({id:item.id,...item.data()}));
