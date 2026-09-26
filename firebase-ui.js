@@ -135,7 +135,8 @@ const openSuperadminDashboard=async()=>{
 byId("superadminLaunch").addEventListener("click",openSuperadminDashboard);
 byId("openPlatformUsers").addEventListener("click",async()=>{if(!isSuperAdmin(auth.currentUser))return;byId("superadminDashboard").hidden=true;byId("platformUsersView").hidden=false;window.scrollTo({top:0});if(!platformData)await renderPlatform();renderPlatformUsers()});
 byId("backPlatformDashboard").addEventListener("click",()=>{byId("platformUsersView").hidden=true;byId("superadminDashboard").hidden=false;window.scrollTo({top:0})});
-byId("superadminSignOut").addEventListener("click",async()=>{await signOutUser();setHeaderUser(null);byId("superadminLaunch").hidden=true;openPublicHome()});
+const legacySuperadminSignOut=byId("superadminSignOut");
+if(legacySuperadminSignOut) legacySuperadminSignOut.addEventListener("click",async()=>{await signOutUser();setHeaderUser(null);byId("superadminLaunch").hidden=true;openPublicHome()});
 
 const launch=byId("launchWorkspace");
 launch.addEventListener("click",async event=>{
