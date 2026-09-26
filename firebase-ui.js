@@ -177,13 +177,11 @@ const openShiftsView=async()=>{
   const sites=await listSites(currentDashboard.companyId);byId("shiftSite").innerHTML=sites.map(s=>'<option value="'+escapeHtml(s.id)+'">'+escapeHtml(s.name)+'</option>').join("");
   shiftData=await listShifts(currentDashboard.companyId);renderShifts();
 };
-byId("openShifts").addEventListener("click",async()=>{await openShiftsView();setShiftView("list")});byId("openCalendar").addEventListener("click",async()=>{await openShiftsView();setShiftView("calendar")});byId("backShiftDashboard").addEventListener("click",()=>{byId("shiftsView").hidden=true;byId("companyDashboard").hidden=false});
+byId("openShifts").addEventListener("click",openShiftsView);byId("openCalendar").addEventListener("click",async()=>{if(!currentDashboard)return;byId("companyDashboard").hidden=true;byId("calendarView").hidden=false;window.scrollTo({top:0});shiftData=await listShifts(currentDashboard.companyId);calendarWeekStart=mondayFor(new Date());renderWeeklyCalendar()});byId("backShiftDashboard").addEventListener("click",()=>{byId("shiftsView").hidden=true;byId("companyDashboard").hidden=false});byId("backCalendarDashboard").addEventListener("click",()=>{byId("calendarView").hidden=true;byId("companyDashboard").hidden=false});
 byId("addShift").addEventListener("click",()=>{byId("shiftEditorMessage").textContent="";byId("shiftRecurrence").value="none";byId("shiftRepeatUntilWrap").hidden=true;byId("shiftEditor").hidden=false});
 byId("shiftRecurrence").addEventListener("change",e=>{const repeating=e.target.value!=="none";byId("shiftRepeatUntilWrap").hidden=!repeating;byId("shiftRepeatUntil").required=repeating});
 byId("closeShiftManage").addEventListener("click",()=>byId("shiftManage").hidden=true);byId("closeShiftEditor").addEventListener("click",()=>byId("shiftEditor").hidden=true);
 byId("shiftMonth").value=new Date().toISOString().slice(0,7);byId("shiftMonth").addEventListener("change",renderShifts);
-const setShiftView=mode=>{const calendar=mode==="calendar";byId("shiftList").hidden=calendar;byId("shiftCalendar").hidden=!calendar;byId("shiftMonth").hidden=calendar;byId("weekControls").hidden=!calendar;byId("shiftListMode").classList.toggle("active",!calendar);byId("shiftCalendarMode").classList.toggle("active",calendar);if(calendar)renderWeeklyCalendar()};
-byId("shiftListMode").addEventListener("click",()=>setShiftView("list"));byId("shiftCalendarMode").addEventListener("click",()=>setShiftView("calendar"));
 byId("previousWeek").addEventListener("click",()=>{calendarWeekStart=mondayFor(calendarWeekStart||new Date());calendarWeekStart.setDate(calendarWeekStart.getDate()-7);renderWeeklyCalendar()});
 byId("nextWeek").addEventListener("click",()=>{calendarWeekStart=mondayFor(calendarWeekStart||new Date());calendarWeekStart.setDate(calendarWeekStart.getDate()+7);renderWeeklyCalendar()});
 byId("thisWeek").addEventListener("click",()=>{calendarWeekStart=mondayFor(new Date());renderWeeklyCalendar()});
