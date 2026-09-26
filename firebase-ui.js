@@ -2,7 +2,7 @@ import { registerCompany, getDashboardData, listSites, saveSite, deleteSite, lis
 import { auth, signIn, signOutUser, observeAuth, isSuperAdmin } from "./auth-service.js";
 
 const byId=id=>document.getElementById(id);
-let currentDashboard=null;
+let currentDashboard=window.ISS_CURRENT_DASHBOARD||null;
 const formData=form=>Object.fromEntries(new FormData(form).entries());
 const message=(el,text,error=false)=>{el.textContent=text;el.classList.toggle("error",error)};
 const setHeaderUser=(user,data={})=>{
@@ -144,7 +144,8 @@ const openShiftManager=async id=>{
   const officerName=m=>[m.firstName,m.lastName].filter(Boolean).join(" ")||m.email;
   const contact=m=>m.phone?(" · "+m.phone):"";
   byId("manageShiftOfficer").innerHTML='<option value="">Select available officer</option>'+available.map(m=>'<option value="'+m.uid+'">'+escapeHtml(officerName(m)+contact(m))+'</option>').join("");
-  byId("manageShiftAvailability").innerHTML='<small class="available-count">'+available.length+' available · '+unavailable.length+' unavailable</small>'+(unavailable.length?unavailable.map(({m,conflict})=>'<div class="officer-unavailable"><span>'+escapeHtml(officerName(m))+(m.phone?' · <a href="tel:'+escapeHtml(m.phone.replace(/[^+\\d]/g,""))+'">'+escapeHtml(m.phone)+'</a>':'')+'</span><small>UNAVAILABLE · Already assigned '+escapeHtml(conflict.siteName||"Shift")+' '+escapeHtml(conflict.startTime||"")+'–'+escapeHtml(conflict.endTime||"")+'</small></div>').join(""):'<small class="availability-clear">No unavailable duty staff for this shift.</small>';
+  const unavailableHtml=unavailable.map(({m,conflict})=>{const phone=String(m.phone||""),tel=phone.replace(/[^+\\d]/g,"");return '<div class="officer-unavailable"><span>'+escapeHtml(officerName(m))+(phone?' · <a href="tel:'+escapeHtml(tel)+'">'+escapeHtml(phone)+'</a>':'')+'</span><small>UNAVAILABLE · Already assigned '+escapeHtml(conflict.siteName||"Shift")+' '+escapeHtml(conflict.startTime||"")+'–'+escapeHtml(conflict.endTime||"")+'</small></div>'}).join("");
+  byId("manageShiftAvailability").innerHTML='<small class="available-count">'+available.length+' available · '+unavailable.length+' unavailable</small>'+(unavailable.length?unavailableHtml:'<small class="availability-clear">No unavailable duty staff for this shift.</small>');
   const draw=()=>{byId("manageShiftAssignments").innerHTML=(shift.assignments||[]).length?(shift.assignments||[]).map(a=>{const phone=String(a.phone||""),tel=phone.replace(/[^+\\d]/g,"");return '<span>'+escapeHtml(a.name)+(phone?' · <a href="tel:'+escapeHtml(tel)+'">'+escapeHtml(phone)+'</a>':'')+' <button type="button" class="remove-assignment" data-uid="'+a.uid+'">Remove</button></span>'}).join(""):'<small>No officers assigned.</small>';document.querySelectorAll(".remove-assignment").forEach(x=>x.onclick=()=>{shift.assignments=(shift.assignments||[]).filter(a=>a.uid!==x.dataset.uid);draw()})};draw();
   byId("manageShiftOfficer").onchange=e=>{const m=shiftMembers.find(x=>x.uid===e.target.value);if(!m)return;shift.assignments=shift.assignments||[];if(shift.assignments.length>=Number(form.elements.positions.value||1)){alert("This shift is full.");e.target.value="";return}shift.assignments.push({uid:m.uid,name:[m.firstName,m.lastName].filter(Boolean).join(" ")||m.email,email:m.email||"",phone:m.phone||"",role:m.role||"Officer",bookedAt:new Date().toISOString(),assignedBy:auth.currentUser.uid});e.target.value="";draw()};
   byId("shiftManage").hidden=false;
@@ -242,35 +243,8 @@ launch.addEventListener("click",async event=>{
   }finally{launch.disabled=false}
 });
 
-const signinForm=byId("signinForm");
-signinForm.addEventListener("submit",async event=>{
-  event.preventDefault();
-  const status=byId("signinMessage");
-  const data=formData(signinForm);
-  const button=signinForm.querySelector('button[type="submit"]');
-  button.disabled=true;
-  message(status,"Signing in…");
-  try{
-    const credential=await signIn(data.email,data.password);
-    const dashboard=await loadDashboard(credential.user);
-    if(!dashboard) throw new Error("Company workspace not found.");
-    byId("signin").hidden=true;
-    message(status,"Signed in.");
-  }catch(error){
-    console.error(error);
-    message(status,"Sign-in failed. Check your account details.",true);
-  }finally{button.disabled=false}
-});
-
-byId("dashboardSignOut").hidden=true;
-
-
-observeAuth(async user=>{
-  if(!user){byId("superadminLaunch").hidden=true;setHeaderUser(null);openPublicHome();return}
-  try{await loadDashboard(user)}catch(error){console.error("Could not restore company workspace.",error)}
-});
-
-
+window.addEventListener("iss-dashboard-ready",event=>{currentDashboard=event.detail||null;if(currentDashboard&&auth.currentUser)setHeaderUser(auth.currentUser,currentDashboard)});
+if(currentDashboard&&auth.currentUser)setHeaderUser(auth.currentUser,currentDashboard);
 const sitesView=byId("sitesView"),siteEditor=byId("siteEditor"),siteFormEditor=byId("siteEditorForm");
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const renderSites=sites=>{
