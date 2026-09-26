@@ -15,11 +15,8 @@ service cloud.firestore {
         && invite(companyId, request.resource.data.invitationId).data.status == "pending";
     }
     function protectedMembershipUnchanged(){
-      return request.resource.data.companyId == resource.data.companyId
-        && request.resource.data.role == resource.data.role
-        && request.resource.data.status == resource.data.status
-        && request.resource.data.siteId == resource.data.siteId
-        && request.resource.data.invitationId == resource.data.invitationId;
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(["firstName", "lastName", "updatedAt"]);
     }
     match /workspaceSlugs/{slug} {
       allow read: if true;
