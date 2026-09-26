@@ -1,4 +1,5 @@
-import { registerCompany, getDashboardData, listSites, saveSite, listInvitations, saveInvitation, setInvitationStatus, acceptInvitation, getPlatformOverview } from "./backend.js";\nimport { auth, signIn, signOutUser, observeAuth, isSuperAdmin } from "./auth-service.js";
+import { registerCompany, getDashboardData, listSites, saveSite, listInvitations, saveInvitation, setInvitationStatus, acceptInvitation, getPlatformOverview } from "./backend.js";
+import { auth, signIn, signOutUser, observeAuth, isSuperAdmin } from "./auth-service.js";
 
 const byId=id=>document.getElementById(id);
 const formData=form=>Object.fromEntries(new FormData(form).entries());
