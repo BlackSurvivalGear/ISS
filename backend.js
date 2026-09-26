@@ -121,6 +121,18 @@ export async function listShifts(companyId){
 export async function createShift(companyId,shift){
   return (await addDoc(collection(db,"companies",companyId,"shifts"),{siteId:shift.siteId,siteName:shift.siteName||"",date:shift.date,startTime:shift.startTime,endTime:shift.endTime,positions:Number(shift.positions)||1,requiredRole:shift.requiredRole||"Officer",notes:shift.notes||"",assignments:[],status:"open",createdBy:auth.currentUser.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()})).id;
 }
+export async function updateShift(companyId,shiftId,changes){
+  const ref=doc(db,"companies",companyId,"shifts",shiftId),snap=await getDoc(ref);
+  if(!snap.exists()) throw new Error("Shift not found.");
+  const current=snap.data(),assignments=Array.isArray(changes.assignments)?changes.assignments:(current.assignments||[]);
+  const positions=Number(changes.positions)||1;
+  if(assignments.length>positions) throw new Error("Positions cannot be lower than the number of assigned officers.");
+  await updateDoc(ref,{siteId:changes.siteId,siteName:changes.siteName||"",date:changes.date,startTime:changes.startTime,endTime:changes.endTime,positions,requiredRole:changes.requiredRole||"Officer",notes:changes.notes||"",assignments,status:assignments.length>=positions?"filled":"open",updatedAt:serverTimestamp()});
+}
+export async function listCompanyMembers(companyId){
+  const snap=await getDocs(query(collection(db,"users"),where("companyId","==",companyId)));
+  return snap.docs.map(item=>({uid:item.id,...item.data()}));
+}
 export async function claimShift(companyId,shiftId,user){
   const membership=await getDoc(doc(db,"users",user.uid));
   const role=String(membership.data()?.role||"").trim().toLowerCase().replace(/[_-]+/g," ").replace(/\s+/g," ");
