@@ -173,12 +173,16 @@ const openShiftManager=async id=>{
 };
 const openShiftsView=async()=>{
   if(!currentDashboard)return;
-  byId("companyDashboard").hidden=true;byId("shiftsView").hidden=false;window.scrollTo({top:0});
+  byId("companyDashboard").hidden=true;sitesView.hidden=true;teamView.hidden=true;byId("calendarView").hidden=true;byId("shiftsView").hidden=false;window.scrollTo({top:0});
   const canManage=canManageShifts(currentDashboard.role);byId("addShift").hidden=!canManage;byId("shiftAccessLabel").textContent=canManage?"Schedule coverage and fill vacancies":"View your rota and book available shifts";
   const sites=await listSites(currentDashboard.companyId);byId("shiftSite").innerHTML=sites.map(s=>'<option value="'+escapeHtml(s.id)+'">'+escapeHtml(s.name)+'</option>').join("");
   shiftData=await listShifts(currentDashboard.companyId);renderShifts();
 };
-byId("openShifts").addEventListener("click",openShiftsView);byId("openCalendar").addEventListener("click",async()=>{if(!currentDashboard)return;byId("companyDashboard").hidden=true;byId("calendarView").hidden=false;window.scrollTo({top:0});shiftData=await listShifts(currentDashboard.companyId);calendarWeekStart=mondayFor(new Date());renderWeeklyCalendar()});byId("backShiftDashboard").addEventListener("click",()=>{byId("shiftsView").hidden=true;byId("companyDashboard").hidden=false});byId("backCalendarDashboard").addEventListener("click",()=>{byId("calendarView").hidden=true;byId("companyDashboard").hidden=false});
+const openCalendarView=async()=>{if(!currentDashboard)return;hideOperationalViews();byId("calendarView").hidden=false;window.scrollTo({top:0});shiftData=await listShifts(currentDashboard.companyId);calendarWeekStart=mondayFor(new Date());renderWeeklyCalendar()};
+const hideOperationalViews=()=>{byId("companyDashboard").hidden=true;sitesView.hidden=true;teamView.hidden=true;byId("shiftsView").hidden=true;byId("calendarView").hidden=true};
+const openDashboardView=()=>{sitesView.hidden=true;teamView.hidden=true;byId("shiftsView").hidden=true;byId("calendarView").hidden=true;byId("companyDashboard").hidden=false;window.scrollTo({top:0})};
+byId("openShifts").addEventListener("click",openShiftsView);byId("openCalendar").addEventListener("click",openCalendarView);
+document.querySelectorAll("[data-module-nav]").forEach(button=>button.addEventListener("click",async()=>{const target=button.dataset.moduleNav;if(target==="dashboard")return openDashboardView();if(target==="sites")return openSitesView();if(target==="team")return openTeamView();if(target==="shifts")return openShiftsView();if(target==="calendar")return openCalendarView()}));
 byId("addShift").addEventListener("click",()=>{byId("shiftEditorMessage").textContent="";byId("shiftRecurrence").value="none";byId("shiftRepeatUntilWrap").hidden=true;byId("shiftEditor").hidden=false});
 byId("shiftRecurrence").addEventListener("change",e=>{const repeating=e.target.value!=="none";byId("shiftRepeatUntilWrap").hidden=!repeating;byId("shiftRepeatUntil").required=repeating});
 byId("closeShiftManage").addEventListener("click",()=>byId("shiftManage").hidden=true);byId("closeShiftEditor").addEventListener("click",()=>byId("shiftEditor").hidden=true);
@@ -286,10 +290,10 @@ const refreshSites=async()=>{
   renderSites(sites);byId("dashboardSites").textContent=String(sites.length);applyRoleAccess(currentDashboard);
   return sites;
 };
-const openSitesView=async()=>{if(!roleAccess(currentDashboard?.role).sites)return;byId("companyDashboard").hidden=true;sitesView.hidden=false;window.scrollTo({top:0});await refreshSites()};
+const openSitesView=async()=>{if(!roleAccess(currentDashboard?.role).sites)return;byId("companyDashboard").hidden=true;teamView.hidden=true;byId("shiftsView").hidden=true;byId("calendarView").hidden=true;sitesView.hidden=false;window.scrollTo({top:0});await refreshSites()};
 byId("openSites").addEventListener("click",openSitesView);
 byId("openSites").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")openSitesView()});
-byId("backDashboard").addEventListener("click",()=>{sitesView.hidden=true;byId("companyDashboard").hidden=false;window.scrollTo({top:0})});
+
 const showSiteEditor=site=>{siteFormEditor.reset();siteFormEditor.elements.id.value=site?.id||"";siteFormEditor.elements.name.value=site?.name||"";siteFormEditor.elements.clientName.value=site?.clientName||"";siteFormEditor.elements.address.value=site?.address||"";siteFormEditor.elements.timezone.value=site?.timezone||"Europe/London";siteFormEditor.elements.contact.value=site?.contact||"";siteFormEditor.elements.status.value=site?.status||"setup";byId("siteEditorTitle").textContent=site?"Edit Site":"Add Site";siteEditor.hidden=false};
 byId("addSite").addEventListener("click",()=>showSiteEditor(null));
 byId("closeSiteEditor").addEventListener("click",()=>siteEditor.hidden=true);
@@ -304,10 +308,10 @@ const refreshTeam=async()=>{
   if(!currentDashboard)return;
   const invites=await listInvitations(currentDashboard.companyId);renderTeam(invites);byId("dashboardTeam").textContent=String(invites.length);applyRoleAccess(currentDashboard);return invites;
 };
-const openTeamView=async()=>{if(!roleAccess(currentDashboard?.role).team)return;byId("companyDashboard").hidden=true;sitesView.hidden=true;teamView.hidden=false;window.scrollTo({top:0});await refreshTeam()};
+const openTeamView=async()=>{if(!roleAccess(currentDashboard?.role).team)return;byId("companyDashboard").hidden=true;sitesView.hidden=true;byId("shiftsView").hidden=true;byId("calendarView").hidden=true;teamView.hidden=false;window.scrollTo({top:0});await refreshTeam()};
 byId("openTeam").addEventListener("click",openTeamView);
 byId("openTeam").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")openTeamView()});
-byId("backTeamDashboard").addEventListener("click",()=>{teamView.hidden=true;byId("companyDashboard").hidden=false;window.scrollTo({top:0})});
+
 const showTeamEditor=async invite=>{teamEditorForm.reset();const sites=await listSites(currentDashboard.companyId);const siteSelect=teamEditorForm.elements.siteId;siteSelect.innerHTML='<option value="company-wide">Company-wide</option>'+sites.map(site=>'<option value="'+escapeHtml(site.id)+'">'+escapeHtml(site.name)+'</option>').join("");teamEditorForm.elements.id.value=invite?.id||"";teamEditorForm.elements.name.value=invite?.name||"";teamEditorForm.elements.email.value=invite?.email||"";teamEditorForm.elements.phone.value=invite?.phone||"";teamEditorForm.elements.role.value=invite?.role||"Officer";siteSelect.value=invite?.siteId||"company-wide";teamEditorForm.elements.status.value=invite?.status||"pending";byId("teamEditorTitle").textContent=invite?"Edit Team Access":"Invite Team Member";teamEditor.hidden=false};
 byId("addTeamInvite").addEventListener("click",()=>showTeamEditor(null));
 byId("closeTeamEditor").addEventListener("click",()=>teamEditor.hidden=true);
