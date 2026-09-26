@@ -106,3 +106,9 @@ body.light #profileForm input{background:#fff;color:#15293a;border-color:#9db6c8
 
 /* Duty Rota month navigation */
 .rota-month-toolbar{justify-content:flex-end}.rota-month-toolbar .rota-month-arrow{width:42px;height:42px;padding:0;font-size:24px;line-height:1}.rota-month-label{min-width:150px;text-align:center;font-size:15px;letter-spacing:.02em;color:var(--text)}body.light .rota-month-label{color:#17334c}@media(max-width:520px){.rota-month-toolbar{justify-content:center}.rota-month-label{min-width:130px}}
+
+
+/* Light-mode Duty Rota summary cards */
+body.light .shift-stats article{background:linear-gradient(145deg,#eef4f8,#c7d8e3);border-color:#9db6c8;color:#102a43;box-shadow:inset 0 1px #fff,0 8px 22px #36566c16}
+body.light .shift-stats article span{color:#506c83}
+body.light .shift-stats article strong{color:#102a43}
