@@ -25,7 +25,7 @@ const publish=(user,data)=>{
   if(typeof window.ISS_APPLY_DASHBOARD==="function")window.ISS_APPLY_DASHBOARD(user,data||null);
   else window.dispatchEvent(new CustomEvent("iss-dashboard-ready",{detail:data||null}));
   const actions=byId("publicHeaderActions"),account=byId("userAccount");
-  if(actions)actions.hidden=Boolean(user);
+  if(actions){actions.hidden=Boolean(user);actions.style.display=user?"none":"";}
   if(account)account.hidden=!user;
 };
 const routeUser=async user=>{
