@@ -22,7 +22,8 @@ const showCompany=data=>{
 };
 const publish=(user,data)=>{
   window.ISS_CURRENT_DASHBOARD=data||null;
-  window.dispatchEvent(new CustomEvent("iss-dashboard-ready",{detail:data||null}));
+  if(typeof window.ISS_APPLY_DASHBOARD==="function")window.ISS_APPLY_DASHBOARD(user,data||null);
+  else window.dispatchEvent(new CustomEvent("iss-dashboard-ready",{detail:data||null}));
   const actions=byId("publicHeaderActions"),account=byId("userAccount");
   if(actions)actions.hidden=Boolean(user);
   if(account)account.hidden=!user;
