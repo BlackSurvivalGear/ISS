@@ -79,7 +79,7 @@
 
   <main id="superadminDashboard" hidden>
     <section class="status-panel company-dashboard">
-      <div class="section-heading"><div><p class="eyebrow">ISS PLATFORM ADMINISTRATION</p><h2>Superadmin Dashboard</h2><small>Platform-wide company oversight</small></div><div><span class="live"><i></i> SUPERADMIN</span> <button class="secondary" type="button" id="superadminSignOut">Sign Out</button></div></div>
+      <div class="section-heading"><div><p class="eyebrow">ISS PLATFORM ADMINISTRATION</p><h2>Superadmin Dashboard</h2><small>Platform-wide company oversight</small></div><div class="actions"><button class="secondary" type="button" id="openPlatformUsers">Users</button><span class="live"><i></i> SUPERADMIN</span></div></div>
       <div class="stats">
         <article><span>Companies</span><strong id="platformCompanies">0</strong><small>Registered workspaces</small></article>
         <article><span>Sites</span><strong id="platformSites">0</strong><small>Security locations</small></article>
@@ -88,12 +88,24 @@
       </div>
     </section>
     <section class="modules superadmin-section"><p class="eyebrow">PLATFORM ALERTS</p><h2>Attention required</h2><div id="platformAlertList" class="admin-alert-list"></div></section>
-    <section class="modules superadmin-section">
-      <div class="section-heading"><div><p class="eyebrow">PLATFORM USERS</p><h2>User directory</h2></div><div class="user-filters"><select id="platformCompanyFilter" aria-label="Filter users by company"><option value="">All companies</option></select><select id="platformRoleFilter" aria-label="Filter users by role"><option value="">All roles</option></select></div></div>
-      <div id="platformUserCount" class="directory-count"></div>
-      <div id="platformUserList" class="admin-user-list"></div>
-    </section>
     <section class="modules superadmin-section"><p class="eyebrow">CUSTOMER COMPANIES</p><h2>Company overview</h2><div id="platformCompanyList" class="admin-company-list"></div></section>
+  </main>
+
+  <main id="platformUsersView" hidden>
+    <section class="status-panel platform-users-page">
+      <div class="platform-users-toolbar">
+        <div><p class="eyebrow">ISS PLATFORM ADMINISTRATION</p><h2>Users</h2><small>Platform-wide user directory</small></div>
+        <button class="secondary" type="button" id="backPlatformDashboard">Back to Dashboard</button>
+      </div>
+      <div class="user-filters sticky-user-filters">
+        <input id="platformNameFilter" type="search" placeholder="Search by name" aria-label="Search users by name">
+        <select id="platformCompanyFilter" aria-label="Filter users by company"><option value="">All companies</option></select>
+        <select id="platformRoleFilter" aria-label="Filter users by role"><option value="">All roles</option></select>
+        <select id="platformStatusFilter" aria-label="Filter users by status"><option value="">All statuses</option></select>
+        <span id="platformUserCount" class="directory-count"></span>
+      </div>
+      <div id="platformUserList" class="admin-user-list platform-user-scroll"></div>
+    </section>
   </main>
 
   <main id="teamView" hidden>
