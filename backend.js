@@ -34,16 +34,17 @@ export async function updateUserProfile(uid,{firstName,lastName}){
 export async function getDashboardData(uid){
   const userSnap=await getDoc(doc(db,"users",uid));
   if(!userSnap.exists()) return null;
-  const companyId=userSnap.data().companyId;
-  const [companySnap,sitesSnap,invitesSnap]=await Promise.all([
-    getDoc(doc(db,"companies",companyId)),
-    getDocs(collection(db,"companies",companyId,"sites")),
-    getDocs(collection(db,"companies",companyId,"invitations"))
-  ]);
+  const user=userSnap.data(),companyId=user.companyId;
+  if(!companyId) return null;
+  const companySnap=await getDoc(doc(db,"companies",companyId));
   if(!companySnap.exists()) return null;
   const company=companySnap.data();
-  const user=userSnap.data();
-  return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount:sitesSnap.size,teamCount:invitesSnap.size,role:user.role||"Officer",siteId:user.siteId||"company-wide",siteName:user.siteName||"Company-wide",firstName:user.firstName||"",lastName:user.lastName||"",email:user.email||""};
+  let siteCount=0,teamCount=0;
+  try{siteCount=(await getDocs(collection(db,"companies",companyId,"sites"))).size}catch(error){console.warn("Dashboard site count unavailable",error)}
+  if(["Company Owner","company_owner","Operations Manager","operations_manager"].includes(user.role)){
+    try{teamCount=(await getDocs(collection(db,"companies",companyId,"invitations"))).size}catch(error){console.warn("Dashboard team count unavailable",error)}
+  }
+  return {companyId,companyName:company.name||"Company Dashboard",workspaceSlug:company.workspaceSlug||"",siteCount,teamCount,role:user.role||"Officer",siteId:user.siteId||"company-wide",siteName:user.siteName||"Company-wide",firstName:user.firstName||"",lastName:user.lastName||"",email:user.email||""};
 }
 
 export async function getPlatformOverview(){
