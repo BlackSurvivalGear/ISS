@@ -174,14 +174,18 @@ export async function listCompanyMembers(companyId){
 export async function claimShift(companyId,shiftId,user){
   const membership=await getDoc(doc(db,"users",user.uid));
   const role=String(membership.data()?.role||"").trim().toLowerCase().replace(/[_-]+/g," ").replace(/\s+/g," ");
-  if(["company owner","operations manager","controller","supervisor"].includes(role)) throw new Error("Management accounts cannot self-book shifts.");
+  if(["company owner","operations manager","controller"].includes(role)) throw new Error("Management accounts cannot self-book shifts.");
+  if(!["officer","team leader","supervisor"].includes(role)) throw new Error("Your role cannot self-book shifts.");
   const ref=doc(db,"companies",companyId,"shifts",shiftId),snap=await getDoc(ref);
   if(!snap.exists())throw new Error("Shift not found.");
   const shift=snap.data(),assignments=Array.isArray(shift.assignments)?shift.assignments:[];
   if(assignments.some(item=>item.uid===user.uid))throw new Error("You are already booked on this shift.");
   if(assignments.length>=Number(shift.positions||1))throw new Error("This shift is already full.");
   const all=await listShifts(companyId);
-  const clash=all.some(item=>item.id!==shiftId&&(item.assignments||[]).some(a=>a.uid===user.uid)&&item.date===shift.date&&item.startTime<shift.endTime&&item.endTime>shift.startTime);
+  const toMinutes=t=>{const [h,m]=String(t||"00:00").split(":").map(Number);return h*60+m};
+  const span=item=>{const start=new Date(item.date+"T00:00:00").getTime()/60000+toMinutes(item.startTime),rawEnd=new Date(item.date+"T00:00:00").getTime()/60000+toMinutes(item.endTime);return [start,rawEnd<=start?rawEnd+1440:rawEnd]};
+  const [targetStart,targetEnd]=span(shift);
+  const clash=all.some(item=>item.id!==shiftId&&(item.assignments||[]).some(a=>a.uid===user.uid)&&(()=>{const [a,b]=span(item);return targetStart<b&&a<targetEnd})());
   if(clash)throw new Error("This shift overlaps another shift you are booked on.");
   assignments.push({uid:user.uid,name:user.name||user.email||"Officer",email:user.email||"",bookedAt:new Date().toISOString()});
   await updateDoc(ref,{assignments,status:assignments.length>=Number(shift.positions||1)?"filled":"open",updatedAt:serverTimestamp()});
