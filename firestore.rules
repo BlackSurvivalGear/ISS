@@ -5,6 +5,7 @@ service cloud.firestore {
     function superAdmin(){ return signedIn() && request.auth.token.email == "admin@lawal.org"; }
     function userDoc(){ return get(/databases/$(database)/documents/users/$(request.auth.uid)); }
     function companyMember(companyId){ return signedIn() && userDoc().data.companyId == companyId && userDoc().data.status == "active"; }
+    function companyOwner(companyId){ return companyMember(companyId) && get(/databases/$(database)/documents/companies/$(companyId)).data.ownerUid == request.auth.uid; }
     function invite(companyId, invitationId){ return get(/databases/$(database)/documents/companies/$(companyId)/invitations/$(invitationId)); }
     function validInvitation(companyId){
       return signedIn()
@@ -29,7 +30,7 @@ service cloud.firestore {
       allow create: if signedIn() && request.auth.uid == uid && (request.resource.data.companyId == uid || validInvitation(request.resource.data.companyId));
       allow read: if signedIn() && (superAdmin() || request.auth.uid == uid || companyMember(resource.data.companyId));
       allow update: if signedIn() && request.auth.uid == uid && protectedMembershipUnchanged();
-      allow delete: if false;
+      allow delete: if signedIn() && companyOwner(resource.data.companyId);
     }
     match /companies/{companyId} {
       allow create: if signedIn() && request.auth.uid == companyId && request.resource.data.ownerUid == request.auth.uid;
@@ -40,7 +41,7 @@ service cloud.firestore {
         allow read: if superAdmin() || companyMember(companyId) || (signedIn() && resource.data.email == request.auth.token.email);
         allow create: if signedIn() && request.auth.uid == companyId;
         allow update: if companyMember(companyId) || (signedIn() && resource.data.email == request.auth.token.email && resource.data.status == "pending" && request.resource.data.status == "active" && request.resource.data.acceptedUid == request.auth.uid);
-        allow delete: if companyMember(companyId);
+        allow delete: if companyOwner(companyId) && resource.data.status == "suspended";
       }
       match /{document=**} {
         allow read: if superAdmin() || companyMember(companyId);
