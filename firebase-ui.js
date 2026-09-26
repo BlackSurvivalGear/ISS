@@ -243,8 +243,15 @@ launch.addEventListener("click",async event=>{
   }finally{launch.disabled=false}
 });
 
-window.addEventListener("iss-dashboard-ready",event=>{currentDashboard=event.detail||null;if(currentDashboard&&auth.currentUser)setHeaderUser(auth.currentUser,currentDashboard)});
-if(currentDashboard&&auth.currentUser)setHeaderUser(auth.currentUser,currentDashboard);
+const applyAuthenticatedDashboard=(user,data)=>{
+  currentDashboard=data||null;
+  if(!currentDashboard||!user)return;
+  setHeaderUser(user,currentDashboard);
+  applyRoleAccess(currentDashboard);
+};
+window.ISS_APPLY_DASHBOARD=applyAuthenticatedDashboard;
+window.addEventListener("iss-dashboard-ready",event=>applyAuthenticatedDashboard(auth.currentUser,event.detail));
+if(window.ISS_CURRENT_DASHBOARD&&auth.currentUser)applyAuthenticatedDashboard(auth.currentUser,window.ISS_CURRENT_DASHBOARD);
 const sitesView=byId("sitesView"),siteEditor=byId("siteEditor"),siteFormEditor=byId("siteEditorForm");
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const renderSites=sites=>{
