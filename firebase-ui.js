@@ -94,7 +94,9 @@ const loadDashboard=async user=>{
 };
 
 let shiftData=[];
-const shiftManagers=new Set(["Company Owner","Operations Manager","Controller","Supervisor"]);
+const normalizedRole=role=>String(role||"").trim().toLowerCase().replace(/[_-]+/g," ").replace(/\s+/g," ");
+const shiftManagers=new Set(["company owner","operations manager","controller","supervisor"]);
+const canManageShifts=role=>shiftManagers.has(normalizedRole(role));
 const renderShifts=()=>{
   const uid=auth.currentUser?.uid,month=byId("shiftMonth").value;
   const visible=shiftData.filter(s=>!month||String(s.date||"").startsWith(month)).sort((a,b)=>String(a.date+a.startTime).localeCompare(String(b.date+b.startTime)));
@@ -108,7 +110,7 @@ const renderShifts=()=>{
 const openShiftsView=async()=>{
   if(!currentDashboard)return;
   byId("companyDashboard").hidden=true;byId("shiftsView").hidden=false;window.scrollTo({top:0});
-  const canManage=shiftManagers.has(currentDashboard.role);byId("addShift").hidden=!canManage;byId("shiftAccessLabel").textContent=canManage?"Schedule coverage and fill vacancies":"View your rota and book available shifts";
+  const canManage=canManageShifts(currentDashboard.role);byId("addShift").hidden=!canManage;byId("shiftAccessLabel").textContent=canManage?"Schedule coverage and fill vacancies":"View your rota and book available shifts";
   const sites=await listSites(currentDashboard.companyId);byId("shiftSite").innerHTML=sites.map(s=>'<option value="'+escapeHtml(s.id)+'">'+escapeHtml(s.name)+'</option>').join("");
   shiftData=await listShifts(currentDashboard.companyId);renderShifts();
 };
