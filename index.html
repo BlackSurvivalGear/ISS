@@ -69,7 +69,7 @@
         <article><span>Status</span><strong>LIVE</strong><small>Company workspace active</small></article>
       </div>
     </section>
-    <section class="modules"><p class="eyebrow">OPERATIONS</p><h2>Company control centre</h2><div class="module-grid">
+    <section class="modules compact-modules"><h2>Operations</h2><div class="module-grid">
       <article class="module-action" id="openSites" tabindex="0"><b>01</b><h3>Sites</h3><p>Manage security locations and site requirements.</p></article>
       <article class="module-action" id="openTeam" tabindex="0"><b>02</b><h3>Team</h3><p>Manage officers, supervisors and company access.</p></article>
       <article class="module-link" id="openShifts"><b>03</b><h3>Shifts & Patrols</h3><p>Schedule duty periods, fill vacancies and manage patrols.</p></article>
@@ -80,7 +80,8 @@
 
   <main id="shiftsView" hidden>
     <section class="status-panel shifts-page">
-      <div class="section-heading"><div><p class="eyebrow">SHIFT MANAGEMENT</p><h2>Duty Rota</h2><small id="shiftAccessLabel">Schedule and manage site coverage</small></div><div class="actions"><button class="secondary" id="backShiftDashboard" type="button">Back to Dashboard</button><button class="primary" id="addShift" type="button">Create Shift</button></div></div>
+      <nav class="module-nav" aria-label="Operations navigation"><button type="button" class="module-nav-btn" data-module-nav="dashboard">Dashboard</button><button type="button" class="module-nav-btn" data-module-nav="sites">Sites</button><button type="button" class="module-nav-btn" data-module-nav="team">Team</button><button type="button" class="module-nav-btn active" data-module-nav="shifts">Shifts &amp; Patrols</button><button type="button" class="module-nav-btn" data-module-nav="calendar">Calendar</button></nav>
+      <div class="section-heading"><div><p class="eyebrow">SHIFT MANAGEMENT</p><h2>Duty Rota</h2><small id="shiftAccessLabel">Schedule and manage site coverage</small></div><div class="actions"><button class="primary" id="addShift" type="button">Create Shift</button></div></div>
       <div class="shift-stats"><article><span>Upcoming</span><strong id="shiftUpcoming">0</strong></article><article><span>Open positions</span><strong id="shiftOpen">0</strong></article><article><span>My shifts</span><strong id="shiftMine">0</strong></article></div>
       <div class="shift-toolbar"><input type="month" id="shiftMonth"></div>
       <div id="shiftList" class="shift-list"></div>
@@ -89,7 +90,8 @@
 
   <main id="calendarView" hidden>
     <section class="status-panel shifts-page">
-      <div class="section-heading"><div><p class="eyebrow">SHIFT CALENDAR</p><h2>Weekly Operations Calendar</h2><small>Monday–Sunday duty coverage</small></div><button class="secondary" id="backCalendarDashboard" type="button">Back to Dashboard</button></div>
+      <nav class="module-nav" aria-label="Operations navigation"><button type="button" class="module-nav-btn" data-module-nav="dashboard">Dashboard</button><button type="button" class="module-nav-btn" data-module-nav="sites">Sites</button><button type="button" class="module-nav-btn" data-module-nav="team">Team</button><button type="button" class="module-nav-btn" data-module-nav="shifts">Shifts &amp; Patrols</button><button type="button" class="module-nav-btn active" data-module-nav="calendar">Calendar</button></nav>
+      <div class="section-heading"><div><p class="eyebrow">SHIFT CALENDAR</p><h2>Weekly Operations Calendar</h2><small>Monday–Sunday duty coverage</small></div></div>
       <div class="shift-toolbar"><div class="week-controls" id="weekControls"><button class="secondary" id="previousWeek" type="button" aria-label="Previous week">‹</button><button class="secondary" id="thisWeek" type="button">This Week</button><button class="secondary" id="nextWeek" type="button" aria-label="Next week">›</button><strong id="weekRange"></strong></div></div>
       <div id="shiftCalendar" class="shift-calendar"></div>
     </section>
@@ -130,7 +132,8 @@
 
   <main id="teamView" hidden>
     <section class="status-panel sites-page">
-      <div class="section-heading"><div><p class="eyebrow">TEAM MANAGEMENT</p><h2>Invitations & Roles</h2></div><div class="actions"><button class="secondary" id="backTeamDashboard" type="button">Back to Dashboard</button><button class="primary" id="addTeamInvite" type="button">Invite Team Member</button></div></div>
+      <nav class="module-nav" aria-label="Operations navigation"><button type="button" class="module-nav-btn" data-module-nav="dashboard">Dashboard</button><button type="button" class="module-nav-btn" data-module-nav="sites">Sites</button><button type="button" class="module-nav-btn active" data-module-nav="team">Team</button><button type="button" class="module-nav-btn" data-module-nav="shifts">Shifts &amp; Patrols</button><button type="button" class="module-nav-btn" data-module-nav="calendar">Calendar</button></nav>
+      <div class="section-heading"><div><p class="eyebrow">TEAM MANAGEMENT</p><h2>Invitations & Roles</h2></div><div class="actions"><button class="primary" id="addTeamInvite" type="button">Invite Team Member</button></div></div>
       <p class="intro sites-intro">Invite staff and control their operational role within the company workspace.</p>
       <div id="teamList" class="sites-list"></div>
     </section>
@@ -140,7 +143,8 @@
 
   <main id="sitesView" hidden>
     <section class="status-panel sites-page">
-      <div class="section-heading"><div><p class="eyebrow">SITE MANAGEMENT</p><h2>Security Sites</h2></div><div class="actions"><button class="secondary" id="backDashboard" type="button">Back to Dashboard</button><button class="primary" id="addSite" type="button">Add Site</button></div></div>
+      <nav class="module-nav" aria-label="Operations navigation"><button type="button" class="module-nav-btn" data-module-nav="dashboard">Dashboard</button><button type="button" class="module-nav-btn active" data-module-nav="sites">Sites</button><button type="button" class="module-nav-btn" data-module-nav="team">Team</button><button type="button" class="module-nav-btn" data-module-nav="shifts">Shifts &amp; Patrols</button><button type="button" class="module-nav-btn" data-module-nav="calendar">Calendar</button></nav>
+      <div class="section-heading"><div><p class="eyebrow">SITE MANAGEMENT</p><h2>Security Sites</h2></div><div class="actions"><button class="primary" id="addSite" type="button">Add Site</button></div></div>
       <p class="intro sites-intro">Manage client locations, operational status and site contact details.</p>
       <div id="sitesList" class="sites-list"></div>
     </section>
